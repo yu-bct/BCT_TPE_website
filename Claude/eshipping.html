@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eShipping Tracking System — BCT Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #121212;
+  background: #fff;
+}
+.page-wrap { overflow-x: hidden; width: 100%; }
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+
+/* ── TOKENS ── */
+:root {
+  --blue:       #04ACEB;
+  --deep-blue:  #2E3841;
+  --dark:       #121212;
+  --mid-gray:   #6D777F;
+  --light-blue: #E2EAF0;
+  --surface:    #F6F8FA;
+  --gradient:   linear-gradient(90.83deg, #06AEEA 5.625%, #2CD1C1 98.565%);
+  --radius:     8px;
+  --inner-w:    1280px;
+  --px:         80px;
+}
+
+/* ── HEADER ── */
+.header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 88px;
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--px);
+  transition: box-shadow .2s;
+}
+.header.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,.06); }
+.h-logo { flex-shrink: 0; }
+.h-logo img { height: 36px; width: auto; }
+.h-nav { display: flex; align-items: center; gap: 32px; flex-shrink: 1; min-width: 0; }
+.h-nav a {
+  font-size: 16px; font-weight: 500; color: var(--dark);
+  display: flex; align-items: center; gap: 4px;
+  transition: color .15s;
+}
+.h-nav a:hover { color: var(--blue); }
+.h-nav .arr { font-size: 10px; opacity: .5; }
+.btn-grad {
+  background: var(--gradient);
+  color: #fff; font-family: 'Poppins', sans-serif;
+  font-size: 16px; font-weight: 700;
+  border: none; border-radius: 99px;
+  padding: 12px 24px; cursor: pointer;
+  transition: opacity .15s, transform .15s;
+}
+.btn-grad:hover { opacity: .9; transform: translateY(-1px); }
+
+/* ── HERO ── */
+.hero {
+  padding-top: 88px; /* header offset */
+  min-height: calc(88px + 816px);
+  background: #fff;
+  overflow: hidden;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 200px;
+  background: url('uploads/eshipping/img_hero_bk_list.png') center center / cover no-repeat;
+  -webkit-mask-image:
+    linear-gradient(to right,  transparent 0%, #000 18%, #000 82%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image:
+    linear-gradient(to right,  transparent 0%, #000 18%, #000 82%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mask-composite: intersect;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-inner {
+  max-width: calc(var(--inner-w) + var(--px)*2);
+  margin: 0 auto;
+  padding: 160px var(--px) 0;
+  position: relative; z-index: 1;
+}
+.hero-dashboard {
+  width: 100%;
+  max-width: var(--inner-w);
+  height: 412px;
+  background: transparent;
+  overflow: hidden;
+  position: relative;
+}
+/* ── Glow layers (radial spotlight from below) ── */
+.hd-glow {
+  position: absolute;
+  width: 720px; height: 720px;
+  left: 50%; top: 424px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity .7s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.hd-glow.active { opacity: 1; }
+.hd-glow-orange { background: radial-gradient(circle, rgba(248,198,48,.95) 0%, rgba(248,198,48,.5) 25%, rgba(254,247,225,0) 68%); }
+.hd-glow-blue   { background: radial-gradient(circle, rgba(4,169,251,.95) 0%, rgba(4,169,251,.5) 25%, rgba(225,245,255,0) 68%); }
+.hd-glow-green  { background: radial-gradient(circle, rgba(151,215,0,.95) 0%, rgba(151,215,0,.5) 25%, rgba(244,251,230,0) 68%); }
+/* ── Status tag (label pill) ── */
+.hd-tag {
+  position: absolute;
+  left: 50%; top: 40px;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+  background: #fff;
+  border: 1px solid #E2EAF0;
+  border-radius: 12px;
+  padding: 4px 32px 4px 24px;
+  font-size: 20px; font-weight: 600;
+  color: #121212; white-space: nowrap;
+  box-shadow: 0 16px 24px rgba(0,0,0,.10);
+  opacity: 0;
+  transition: opacity .5s ease;
+  z-index: 4;
+}
+.hd-tag.active { opacity: 1; }
+.hd-icon {
+  width: 48px; height: 48px;
+  background: #fff; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.hd-icon svg { width: 28px; height: 28px; }
+/* ── Floor gradient (transparent → white, covers bottom 100px) ── */
+.hd-floor {
+  position: absolute;
+  left: 0; right: 0; top: 312px; height: 100px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
+  z-index: 2; pointer-events: none;
+}
+/* ── Box shadow ── */
+.hd-shadow {
+  position: absolute;
+  width: 200px; height: 14px;
+  left: 50%; top: 332px;
+  transform: translateX(-50%);
+  background: rgba(224,184,66,.45);
+  border-radius: 50%;
+  filter: blur(6px);
+  z-index: 3;
+}
+/* ── 3D Cardboard box ── */
+.hd-box {
+  position: absolute;
+  width: 560px; height: auto;
+  left: 50%; top: 230px;
+  transform: translate(-50%, -50%);
+  z-index: 3; pointer-events: none;
+}
+.hero-text {
+  text-align: center;
+  padding: 40px var(--px) 80px;
+  position: relative; z-index: 1;
+}
+.hero-text h1 {
+  font-size: 56px; font-weight: 700; line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+.hero-text h1 span {
+  background: linear-gradient(90deg, #06AEEA 0%, #2CD1C1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-float-left {
+  position: absolute;
+  left: 80px;
+  top: 240px;
+  z-index: 2;
+  width: 220px;
+  filter: drop-shadow(0 8px 28px rgba(0,0,0,.13));
+  pointer-events: none;
+}
+.hero-float-right {
+  position: absolute;
+  right: 80px;
+  top: 130px;
+  z-index: 2;
+  width: 267px;
+  filter: drop-shadow(0 8px 28px rgba(0,0,0,.13));
+  pointer-events: none;
+}
+
+/* ── SECTION BASE ── */
+section { width: 100%; }
+.sec-inner {
+  max-width: calc(var(--inner-w) + var(--px)*2);
+  margin: 0 auto;
+  padding: 100px var(--px);
+}
+.sec-title {
+  font-size: 40px; font-weight: 700; line-height: 1.3;
+  text-align: center; color: var(--dark);
+  margin-bottom: 64px;
+}
+
+/* ── CHALLENGE ── */
+.challenge { background: #fff; }
+.challenge-inner {
+  max-width: calc(var(--inner-w) + var(--px)*2);
+  margin: 0 auto;
+  min-height: 640px;
+  display: flex; align-items: center;
+}
+.challenge-photo {
+  width: 49.2%;
+  height: 480px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.challenge-photo img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.challenge-content {
+  flex: 1;
+  padding: 80px 80px 80px 80px;
+  display: flex; flex-direction: column; gap: 40px;
+}
+.challenge-content h2 {
+  font-size: 40px; font-weight: 700; line-height: 1.3;
+  color: var(--dark);
+}
+.challenge-content p {
+  font-size: 20px; font-weight: 500; line-height: 1.4;
+  color: var(--dark);
+}
+
+/* ── APP SHOWCASE ── */
+.app-showcase {
+  position: relative;
+  background: url('uploads/eshipping/sea.jpg') center 62% / cover no-repeat, #DBF2F5;
+  min-height: 816px;
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+/* White scrim so the sea photo stays soft and text/cards remain readable */
+.app-showcase::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    rgba(248,250,251,.90) 0%,
+    rgba(248,250,251,.66) 36%,
+    rgba(240,249,250,.50) 70%,
+    rgba(232,246,248,.58) 100%);
+  pointer-events: none;
+}
+.app-showcase-inner {
+  position: relative; z-index: 1;
+  max-width: calc(var(--inner-w) + var(--px)*2);
+  margin: 0 auto;
+  padding: 80px var(--px);
+  width: 100%;
+}
+.app-showcase-title {
+  font-size: 40px; font-weight: 700; line-height: 1.3;
+  text-align: center; color: var(--dark);
+  margin-bottom: 56px;
+}
+.app-showcase-title span { color: var(--blue); }
+/* ── Flow: 2-column (step nav + animated stage) ── */
+.flow-wrap {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 48px;
+  align-items: stretch;
+}
+/* Step navigation */
+.flow-nav { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+.flow-step {
+  position: relative;
+  display: flex; gap: 16px; align-items: flex-start;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 18px 20px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background .3s;
+  font-family: inherit;
+}
+.flow-step:hover { background: #EEF4F8; }
+.flow-step.active { background: #fff; box-shadow: 0 8px 30px rgba(46,56,65,.08); }
+.fs-num {
+  flex-shrink: 0;
+  width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  background: #E7EDF2; color: var(--mid-gray);
+  transition: all .3s;
+}
+.flow-step.active .fs-num { background: var(--gradient); color: #fff; }
+.fs-title { display: block; font-size: 16px; font-weight: 600; color: var(--dark); margin-bottom: 3px; }
+.fs-desc  { display: block; font-size: 13px; line-height: 1.5; color: var(--mid-gray); }
+/* Stage area */
+.flow-stage-area {
+  position: relative;
+  min-height: 460px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 24px 64px rgba(46,56,65,.12);
+  overflow: hidden;
+}
+.flow-stage {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 32px; padding: 40px;
+  opacity: 0; visibility: hidden;
+  transition: opacity .5s ease;
+}
+.flow-stage.active { opacity: 1; visibility: visible; }
+
+/* Paper document (shared look) */
+.doc {
+  width: 210px; flex-shrink: 0;
+  background: #fff;
+  border: 1px solid #E2EAF0;
+  border-radius: 10px;
+  box-shadow: 0 14px 40px rgba(46,56,65,.12);
+  padding: 20px 18px;
+  position: relative;
+}
+.doc-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.doc-badge { width: 26px; height: 26px; border-radius: 6px; background: var(--gradient); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.doc-title { font-size: 11px; font-weight: 700; color: var(--deep-blue); letter-spacing: .3px; }
+.doc-line { height: 7px; border-radius: 4px; background: #EEF2F5; margin-bottom: 9px; }
+.doc-line.w-90 { width: 90%; } .doc-line.w-70 { width: 70%; } .doc-line.w-80 { width: 80%; }
+.doc-line.w-50 { width: 50%; } .doc-line.w-60 { width: 60%; }
+
+/* STAGE 1 — Upload */
+.up-zone {
+  width: 380px; padding: 44px 32px;
+  border: 2px dashed #9FCBE3;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #F4FBFF, #EAF6FF);
+  text-align: center;
+}
+.up-doc-wrap { display: flex; justify-content: center; margin-bottom: 22px; }
+.flow-stage.active .up-doc-wrap .doc { animation: docDrop 1.6s ease infinite; }
+@keyframes docDrop {
+  0% { transform: translateY(-14px); box-shadow: 0 26px 50px rgba(46,56,65,.18); }
+  50%{ transform: translateY(0); box-shadow: 0 14px 30px rgba(46,56,65,.12); }
+  100%{ transform: translateY(-14px); box-shadow: 0 26px 50px rgba(46,56,65,.18); }
+}
+.up-cloud {
+  width: 56px; height: 56px; margin: 0 auto 14px;
+  border-radius: 50%; background: var(--gradient);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; color: #fff;
+  box-shadow: 0 10px 24px rgba(6,174,234,.4);
+}
+.up-text { font-size: 14px; font-weight: 600; color: var(--deep-blue); margin-bottom: 4px; }
+.up-sub  { font-size: 12px; color: var(--mid-gray); margin-bottom: 18px; }
+.up-bar { height: 7px; border-radius: 99px; background: #D5E7F2; overflow: hidden; }
+.up-bar > span {
+  display: block; height: 100%; border-radius: 99px; background: var(--gradient);
+  width: 0;
+}
+.flow-stage.active .up-bar > span { animation: upFill 2.4s ease infinite; }
+@keyframes upFill { 0% { width: 0; } 70%,100% { width: 100%; } }
+
+/* STAGE 2 — Scan & extract */
+.scan-doc { position: relative; overflow: hidden; }
+.scan-doc .scan-line {
+  position: absolute; left: -1px; right: -1px; top: 0; height: 40px;
+  background: linear-gradient(180deg, rgba(6,174,234,0), rgba(44,209,193,.30));
+}
+/* single crisp scanning edge with a localized glow (no top line) */
+.scan-doc .scan-line::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+  background: #2CD1C1;
+  box-shadow: 0 0 12px 1px rgba(44,209,193,.7);
+}
+.flow-stage.active .scan-doc .scan-line { animation: scanMove 2.6s ease-in-out infinite; }
+@keyframes scanMove { 0%{ top: -40px; } 55%,100%{ top: 100%; } }
+.scan-fields { display: flex; flex-direction: column; gap: 12px; width: 250px; }
+.scan-chip {
+  background: #fff; border: 1px solid #E2EAF0; border-radius: 10px;
+  padding: 10px 14px; box-shadow: 0 6px 18px rgba(46,56,65,.06);
+  opacity: 0; transform: translateX(14px);
+}
+.scan-chip .k { display: block; font-size: 10px; font-weight: 600; color: var(--mid-gray); text-transform: uppercase; letter-spacing: .4px; }
+.scan-chip .v { display: block; font-size: 14px; font-weight: 600; color: var(--blue); }
+.flow-stage.active .scan-chip { animation: chipIn 2.6s ease infinite; }
+.flow-stage.active .scan-chip:nth-child(1) { animation-delay: .5s; }
+.flow-stage.active .scan-chip:nth-child(2) { animation-delay: .9s; }
+.flow-stage.active .scan-chip:nth-child(3) { animation-delay: 1.3s; }
+.flow-stage.active .scan-chip:nth-child(4) { animation-delay: 1.7s; }
+@keyframes chipIn {
+  0%,10% { opacity: 0; transform: translateX(14px); }
+  25%,90% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(14px); }
+}
+
+/* STAGE 3 — Sync to global network */
+.sync-flow { display: flex; align-items: center; gap: 0; width: 100%; max-width: 620px; }
+.sync-node {
+  flex-shrink: 0; width: 150px; padding: 22px 16px;
+  border-radius: 16px; text-align: center;
+  font-size: 13px; font-weight: 600; color: var(--deep-blue);
+}
+.sync-node .sync-ic {
+  width: 54px; height: 54px; margin: 0 auto 12px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; font-size: 28px;
+}
+.sync-ours { background: #EAF6FF; }
+.sync-ours .sync-ic { background: var(--gradient); color: #fff; }
+.sync-global { background: #F3FBF9; }
+.sync-global .sync-ic { background: #2CD1C1; color: #fff; }
+.sync-wire { flex: 1; position: relative; height: 3px; background: #DCE7EE; border-radius: 3px; margin: 0 -6px; }
+.sync-wire .packet {
+  position: absolute; top: 50%; left: 0; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--blue); transform: translate(-50%,-50%);
+  box-shadow: 0 0 12px rgba(4,172,235,.8);
+}
+.flow-stage.active .sync-wire .packet.p1 { animation: packetR 2.4s linear infinite; }
+.flow-stage.active .sync-wire .packet.p2 { animation: packetR 2.4s linear infinite; animation-delay: .8s; }
+.flow-stage.active .sync-wire .packet.p3 { animation: packetL 2.4s linear infinite; animation-delay: 1.4s; background: #2CD1C1; }
+@keyframes packetR { 0%{ left: 0; opacity: 0;} 10%{opacity:1;} 90%{opacity:1;} 100%{ left: 100%; opacity: 0; } }
+@keyframes packetL { 0%{ left: 100%; opacity: 0;} 10%{opacity:1;} 90%{opacity:1;} 100%{ left: 0; opacity: 0; } }
+.sync-return {
+  position: absolute; bottom: 46px; left: 50%; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #E8FDF5; color: #10B981; font-size: 13px; font-weight: 600;
+  padding: 8px 16px; border-radius: 99px;
+}
+
+/* STAGE 4 — In transit */
+.track-map {
+  position: relative; width: 100%; max-width: 620px; height: 300px;
+  border-radius: 16px; overflow: hidden;
+}
+/* zero-size anchor pinned exactly on the route endpoint */
+.track-port { position: absolute; width: 0; height: 0; }
+.track-port .dot {
+  position: absolute; left: 0; top: 0; transform: translate(-50%,-50%);
+  width: 14px; height: 14px; border-radius: 50%; background: var(--blue);
+  border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.15);
+}
+.track-port .lbl {
+  position: absolute; left: 0; top: 14px; transform: translateX(-50%);
+  white-space: nowrap; font-size: 12px; font-weight: 600; color: var(--deep-blue);
+}
+.track-port.origin { left: 15%; top: 68%; }
+.track-port.dest   { left: 85%; top: 32%; }
+.track-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.track-svg .route-bg { fill: none; stroke: #C3D7E4; stroke-width: 2.5; stroke-dasharray: 7 7; }
+.track-svg .route-fg { fill: none; stroke: url(#trackGrad); stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 620; stroke-dashoffset: 620; }
+.flow-stage.active .track-svg .route-fg { animation: routeDraw 4s ease-in-out infinite; }
+@keyframes routeDraw { 0%{ stroke-dashoffset: 620; } 60%,100%{ stroke-dashoffset: 0; } }
+.track-ship {
+  position: absolute; top: 0; left: 0; width: 46px; height: 46px;
+  margin: -23px 0 0 -23px;
+  display: flex; align-items: center; justify-content: center; font-size: 30px;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.2));
+  offset-path: path('M 93 204 Q 310 150 527 96');
+  offset-rotate: 0deg;
+}
+.flow-stage.active .track-ship { animation: shipMove 4s ease-in-out infinite; }
+@keyframes shipMove { 0%{ offset-distance: 0%; } 60%,100%{ offset-distance: 100%; } }
+
+/* STAGE 5 — Auto status update */
+.upd-card {
+  width: 100%; max-width: 560px;
+  background: #fff; border: 1px solid #EEF2F5; border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(46,56,65,.10); overflow: hidden;
+}
+.upd-head { display: grid; grid-template-columns: 1.4fr 1fr 1.1fr 1.2fr; background: #F8F9FA; border-bottom: 1px solid #E2EAF0;
+  padding: 12px 18px; font-size: 11px; font-weight: 600; color: var(--mid-gray); text-transform: uppercase; letter-spacing: .3px; }
+.upd-row { display: grid; grid-template-columns: 1.4fr 1fr 1.1fr 1.2fr; align-items: center;
+  padding: 16px 18px; font-size: 13px; color: var(--deep-blue); }
+.upd-row + .upd-row { border-top: 1px solid #F0F3F6; }
+.upd-row .bol { font-weight: 600; color: var(--blue); }
+.upd-badge {
+  display: inline-flex; align-items: center; gap: 6px; justify-self: start;
+  font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 99px;
+  background: #EAF6FF; color: var(--blue);
+}
+.upd-badge.arrived { background: #E8FDF5; color: #10B981; }
+/* Row 1 badge swap: blue "In Progress" -> green "Arrival" */
+.upd-badge-swap { position: relative; justify-self: start; display: inline-grid; }
+.upd-badge-swap .upd-badge { grid-area: 1 / 1; }
+.flow-stage.active .upd-badge-swap .b-prog { animation: swapOut 3.4s ease infinite; }
+.flow-stage.active .upd-badge-swap .b-arr  { animation: swapIn 3.4s ease infinite; }
+@keyframes swapOut { 0%,42% { opacity: 1; } 55%,100% { opacity: 0; } }
+@keyframes swapIn  { 0%,42% { opacity: 0; } 55%,100% { opacity: 1; } }
+.upd-toast {
+  position: absolute; right: 30px; bottom: 30px;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--deep-blue); color: #fff;
+  font-size: 13px; font-weight: 500;
+  padding: 12px 18px; border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(46,56,65,.3);
+  opacity: 0; transform: translateY(12px);
+}
+.upd-toast .tk { width: 22px; height: 22px; border-radius: 50%; background: #10B981; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.flow-stage.active .upd-toast { animation: toastIn 3.4s ease infinite; }
+@keyframes toastIn {
+  0%,40% { opacity: 0; transform: translateY(12px); }
+  55%,88% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(12px); }
+}
+/* Responsive: stack step-nav above the stage on narrower viewports */
+@media (max-width: 960px) {
+  .flow-wrap { grid-template-columns: 1fr; gap: 28px; }
+  .flow-nav { flex-direction: row; flex-wrap: wrap; }
+  .flow-step { flex: 1 1 260px; }
+  .flow-stage-area { min-height: 420px; }
+  .flow-stage { flex-wrap: wrap; padding: 28px; }
+}
+
+/* ── SOLUTION ── */
+.solution { background: #fff; }
+.solution-body {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 40px;
+}
+.solution-list {
+  flex: 0 0 628px;
+  display: flex; flex-direction: column;
+}
+.sol-item {
+  padding: 16px 24px 16px 0;
+  display: flex; flex-direction: column; gap: 12px;
+  border-bottom: 1px solid var(--light-blue);
+}
+.sol-item:last-child { border-bottom: none; }
+.sol-title {
+  display: flex; align-items: center; gap: 12px;
+}
+.sol-title .ic-check {
+  width: 16px; height: 14px; flex-shrink: 0;
+  background: var(--gradient);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+.sol-title h3 {
+  font-size: 20px; font-weight: 600; line-height: 1.4;
+  color: var(--dark); letter-spacing: 0.4px;
+}
+.sol-desc {
+  padding-left: 28px;
+  font-size: 16px; font-weight: 400; line-height: 1.5;
+  color: var(--deep-blue);
+}
+.solution-visual {
+  flex: 0 0 628px;
+  height: 471px;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.solution-visual img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+
+/* ── RESULTS ── */
+.results { background: var(--surface); }
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.result-card {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 40px;
+  padding: 0 40px;
+  text-align: center;
+}
+.result-circle {
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #fff;
+  box-shadow: 0 -6px 24.5px rgba(146,187,241,.15);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.result-circle img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.result-circle.circle-custom {
+  background: linear-gradient(135deg, #EAF6FF 0%, #E2EAF0 100%);
+}
+/* Time-Saving circle: clock illustration */
+.circle-timesaving {
+  background: radial-gradient(circle at 50% 60%, #D4EEFF 0%, #EAF6FF 70%, #E2EAF0 100%);
+}
+/* Workflow circle: window/table illustration */
+.circle-workflow {
+  background: radial-gradient(circle at 50% 60%, #E0F0FF 0%, #EAF6FF 70%, #E2EAF0 100%);
+}
+/* Efficiency circle: document illustration */
+.circle-efficiency {
+  background: radial-gradient(circle at 50% 60%, #E0F4FF 0%, #EAF6FF 70%, #E2EAF0 100%);
+}
+.result-text h3 {
+  font-size: 20px; font-weight: 700; line-height: 1.6;
+  color: var(--dark); letter-spacing: 0.4px;
+  margin-bottom: 8px;
+}
+.result-text p {
+  font-size: 16px; font-weight: 400; line-height: 1.5;
+  color: var(--deep-blue);
+}
+
+/* ── VOICES ── */
+.voices {
+  min-height: 640px;
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: center;
+}
+.voices-bg {
+  position: absolute; inset: 0;
+  background: center/cover no-repeat url('uploads/eshipping/voices_bg.jpg');
+}
+.voices-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(0,0,0,.45);
+}
+.voices-inner {
+  position: relative; z-index: 1;
+  max-width: calc(var(--inner-w) + var(--px)*2);
+  margin: 0 auto;
+  padding: 0 var(--px);
+  width: 100%;
+  display: flex; align-items: center;
+  gap: 120px;
+}
+.voices-label {
+  font-size: 40px; font-weight: 600; line-height: 1.5;
+  color: #fff;
+  flex-shrink: 0;
+  width: 340px;
+}
+.voices-card {
+  background: #fff;
+  padding: 44px;
+  position: relative;
+  max-width: 519px;
+}
+.voices-card .quote-mark {
+  position: absolute; top: 49px; left: 22px;
+  font-size: 80px; line-height: 1;
+  color: var(--blue);
+  font-family: Georgia, serif;
+  opacity: .6;
+}
+.voices-card p {
+  font-size: 28px; font-weight: 500; line-height: 1.57;
+  color: var(--dark); letter-spacing: 0.28px;
+}
+
+/* ── LET'S CONNECT ── */
+.lets-connect {
+  min-height: 640px;
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.connect-dotted {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, #b0d0e8 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: .5;
+}
+.connect-card {
+  position: relative; z-index: 1;
+  background: #fff;
+  padding: 44px;
+  width: 628px; max-width: 90vw;
+  display: flex; flex-direction: column;
+  gap: 48px; align-items: center;
+  text-align: center;
+}
+.connect-card h2 {
+  font-size: 40px; font-weight: 600; line-height: 1.5;
+  color: var(--dark);
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--deep-blue);
+  color: #fff;
+  padding: 64px var(--px) 40px;
+}
+.footer-inner {
+  max-width: calc(var(--inner-w) + var(--px)*2);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 380px 1fr 1fr;
+  gap: 48px;
+}
+.footer-brand img { height: 28px; width: auto; opacity: .85; margin-bottom: 20px; }
+.footer-brand p {
+  font-size: 14px; line-height: 1.7;
+  color: rgba(255,255,255,.6);
+  max-width: 320px;
+}
+.footer-brand .socials {
+  display: flex; gap: 12px; margin-top: 24px;
+}
+.footer-brand .socials a {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  transition: background .15s;
+}
+.footer-brand .socials a:hover { background: var(--blue); }
+.footer-col h4 {
+  font-size: 14px; font-weight: 600; letter-spacing: .5px;
+  color: rgba(255,255,255,.4);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.footer-col ul li a {
+  font-size: 14px; color: rgba(255,255,255,.7);
+  transition: color .15s;
+}
+.footer-col ul li a:hover { color: #fff; }
+.footer-col .contact-line {
+  display: flex; gap: 10px;
+  font-size: 14px; color: rgba(255,255,255,.7);
+  margin-bottom: 12px;
+}
+.footer-divider {
+  max-width: calc(var(--inner-w) + var(--px)*2);
+  margin: 48px auto 0;
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding-top: 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 8px;
+}
+.footer-divider p { font-size: 13px; color: rgba(255,255,255,.4); }
+.footer-regions {
+  font-size: 12px; color: rgba(255,255,255,.35);
+}
+
+/* ── SCROLL ANIMATIONS ── */
+.fade-up {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.fade-up.in { opacity: 1; transform: translateY(0); }
+.fade-left {
+  opacity: 0; transform: translateX(-32px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.fade-left.in { opacity: 1; transform: translateX(0); }
+.fade-right {
+  opacity: 0; transform: translateX(32px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.fade-right.in { opacity: 1; transform: translateX(0); }
+.delay-1 { transition-delay: .1s; }
+.delay-2 { transition-delay: .2s; }
+.delay-3 { transition-delay: .3s; }
+.delay-4 { transition-delay: .4s; }
+
+/* ── CIRCLE ILLUSTRATIONS (CSS) ── */
+.circle-ts-wrap { position: relative; width: 240px; height: 240px; }
+.circle-ts { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; }
+.circle-ts img { width: 100%; height: 100%; object-fit: cover; }
+
+/* clock hand animation for time-saving */
+@keyframes spin-sec { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* BOL table inline styles */
+.bol-num { color: var(--blue); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+<!-- ══ HEADER ══ -->
+<header class="header" id="top">
+  <a href="BCT Taipei Dark.html" class="h-logo">
+    <img src="uploads/ic_bct_logo.png" alt="Bahwan CyberTek">
+  </a>
+  <nav class="h-nav">
+    <a href="#">Industries <span class="arr">▾</span></a>
+    <a href="#">Practices <span class="arr">▾</span></a>
+    <a href="#">Products <span class="arr">▾</span></a>
+    <a href="#">Investors</a>
+    <a href="#">Careers</a>
+    <a href="#">News</a>
+    <a href="#">About</a>
+  </nav>
+  <button class="btn-grad" onclick="document.querySelector('.lets-connect').scrollIntoView({behavior:'smooth'})">Contact Us</button>
+</header>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <img class="hero-float-left fade-left" src="uploads/eshipping/img_calendar.png" alt="Date picker">
+  <img class="hero-float-right fade-right" src="uploads/eshipping/img_status_expand.png" alt="Status filter">
+  <div class="hero-inner">
+    <div class="hero-dashboard fade-up">
+      <!-- Glow layers -->
+      <div class="hd-glow hd-glow-orange active"></div>
+      <div class="hd-glow hd-glow-blue"></div>
+      <div class="hd-glow hd-glow-green"></div>
+      <!-- Status tags -->
+      <div class="hd-tag active" data-state="departure">
+        <div class="hd-icon">
+          <svg viewBox="0 0 29.04 30.96" fill="none" stroke="#121212" stroke-width="2.64" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.6 16.44V29.64H1.32V16.44H6.6ZM27.72 16.44V29.64H22.44V16.44H27.72ZM19.8 16.44V29.64H15.84V16.44H19.8ZM13.2 16.44V29.64H9.24V16.44H13.2Z"/>
+            <path d="M8.52 17.04L14.52 9.84L20.52 17.04"/>
+            <path d="M13.776 0V3.927C14.544 3.927 16.08 4.399 16.08 6.284C16.08 8.169 14.544 8.64 13.776 8.64H11.76" stroke-width="2.88"/>
+          </svg>
+        </div>
+        <span>Departure</span>
+      </div>
+      <div class="hd-tag" data-state="port">
+        <div class="hd-icon">
+          <svg viewBox="0 0 26.88 33.6" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14.88 1.44C14.88.645 14.235 0 13.44 0C12.645 0 12 .645 12 1.44H13.44H14.88ZM13.44 6.24H14.88V1.44H13.44H12V6.24H13.44Z" fill="#121212"/>
+            <path d="M9.44 14.01V6.24C9.44 5.975 9.655 5.76 9.92 5.76H16.96C17.225 5.76 17.44 5.974 17.44 6.239V14.01C17.44 17.31 18.128 19.438 19.04 22.26C20.537 26.89 20.633 29.355 20.64 31.68C20.64 31.945 20.425 32.16 20.16 32.16H6.72C6.455 32.16 6.24 31.947 6.246 31.682C6.294 29.541 6.656 25.312 7.84 22.26C9.12 18.96 9.44 15.385 9.44 14.01Z" stroke="#121212" stroke-width="2.88"/>
+            <path d="M6.24 12.96H20.64" stroke="#121212" stroke-width="2.88" stroke-linecap="round"/>
+            <path d="M1.44 32.16H25.44" stroke="#121212" stroke-width="2.88" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span>Port</span>
+      </div>
+      <div class="hd-tag" data-state="clearance">
+        <div class="hd-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(11.3,8.4)">
+              <path d="M20.4 7.197V12.596C20.4 16.241 17.445 19.197 13.8 19.197C10.155 19.197 7.2 16.241 7.2 12.596V7.197H20.4Z" stroke="#121212" stroke-width="2.4"/>
+              <path d="M20.4 2.928V5.959C17.853 5.959 15.477 5.996 10.042 5.996C7.623 5.996 5.899 5.367 4.706 4.529C2.948 3.293 4.369 1.23 6.518 1.226L18.668 1.2C19.624 1.198 20.4 1.972 20.4 2.928Z" stroke="#121212" stroke-width="2.4"/>
+              <path d="M0 7.196C0 6.534.537 5.996 1.2 5.996H21.6V8.396H1.2C.537 8.396 0 7.859 0 7.196Z" fill="#121212"/>
+            </g>
+            <g transform="translate(11.5,26.5)">
+              <path d="M8.64 1.2H19.008C23.117 1.2 26.448 4.531 26.448 8.64V14.352H1.2V8.64C1.2 4.531 4.531 1.2 8.64 1.2Z" stroke="#121212" stroke-width="2.4"/>
+              <rect x="12.608" y="1.728" width="2.432" height="3.456" fill="#121212"/>
+              <path d="M12.608 6.336H15.04L15.648 13.536L15.04 13.824H12.608L12 13.536L12.608 6.336Z" fill="#121212"/>
+            </g>
+          </svg>
+        </div>
+        <span>Clearance</span>
+      </div>
+      <!-- Floor + shadow + box -->
+      <div class="hd-floor"></div>
+      <div class="hd-shadow"></div>
+      <img class="hd-box" src="uploads/eshipping/box_3d.png" alt="Shipment">
+    </div>
+  </div>
+  <div class="hero-text fade-up delay-1">
+    <h1>eShipping Tracking System<br><span>Shipment Management for Efficiency</span></h1>
+  </div>
+</section>
+
+<!-- ══ CHALLENGE ══ -->
+<section class="challenge">
+  <div class="challenge-inner">
+    <div class="challenge-photo fade-left">
+      <img src="uploads/eshipping/challenge_photo.jpg" alt="Shipping containers">
+    </div>
+    <div class="challenge-content fade-right">
+      <h2>Inefficiencies Cause by the Labor Intensive Processes</h2>
+      <p>Clients struggled with manually tracking large volumes of shipping documents, which was time-consuming and inefficient. The growing business made the manual approach unsustainable.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ APP SHOWCASE ══ -->
+<section class="app-showcase">
+  <div class="app-showcase-inner">
+    <h2 class="app-showcase-title fade-up">Seamless Shipping Information Integration<br>for <span>Effortless Tracking</span></h2>
+    <div class="flow-wrap fade-up delay-1">
+      <!-- Step navigation -->
+      <div class="flow-nav">
+        <button class="flow-step active" data-i="0">
+          <span class="fs-num">01</span>
+          <span class="fs-body">
+            <span class="fs-title">Upload the Bill of Lading</span>
+            <span class="fs-desc">Drop in scanned paper B/Ls or PDFs — no manual data entry required.</span>
+          </span>
+        </button>
+        <button class="flow-step" data-i="1">
+          <span class="fs-num">02</span>
+          <span class="fs-body">
+            <span class="fs-title">Scan &amp; Auto-Extract</span>
+            <span class="fs-desc">Our engine reads the document and pulls every field — BOL, carrier, container, vendor.</span>
+          </span>
+        </button>
+        <button class="flow-step" data-i="2">
+          <span class="fs-num">03</span>
+          <span class="fs-body">
+            <span class="fs-title">Sync to Global Carriers</span>
+            <span class="fs-desc">Extracted data is sent to worldwide shipping systems to fetch live shipment status.</span>
+          </span>
+        </button>
+        <button class="flow-step" data-i="3">
+          <span class="fs-num">04</span>
+          <span class="fs-body">
+            <span class="fs-title">Track in Transit</span>
+            <span class="fs-desc">As the vessel sails, the global network reports back every milestone in real time.</span>
+          </span>
+        </button>
+        <button class="flow-step" data-i="4">
+          <span class="fs-num">05</span>
+          <span class="fs-body">
+            <span class="fs-title">Status Updates Itself</span>
+            <span class="fs-desc">Departure, arrival, clearance — statuses sync automatically, no one lifts a finger.</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Animated stage -->
+      <div class="flow-stage-area">
+        <!-- Stage 1: Upload -->
+        <div class="flow-stage active" data-i="0">
+          <div class="up-zone">
+            <div class="up-doc-wrap">
+              <div class="doc">
+                <div class="doc-head"><span class="doc-badge">📄</span><span class="doc-title">BILL OF LADING</span></div>
+                <div class="doc-line w-90"></div>
+                <div class="doc-line w-70"></div>
+                <div class="doc-line w-80"></div>
+                <div class="doc-line w-50"></div>
+              </div>
+            </div>
+            <div class="up-cloud">&#8593;</div>
+            <div class="up-text">Uploading bill_of_lading.pdf</div>
+            <div class="up-sub">Drag &amp; drop or browse</div>
+            <div class="up-bar"><span></span></div>
+          </div>
+        </div>
+
+        <!-- Stage 2: Scan & extract -->
+        <div class="flow-stage" data-i="1">
+          <div class="doc scan-doc">
+            <div class="doc-head"><span class="doc-badge">📄</span><span class="doc-title">BILL OF LADING</span></div>
+            <div class="doc-line w-90"></div>
+            <div class="doc-line w-70"></div>
+            <div class="doc-line w-80"></div>
+            <div class="doc-line w-60"></div>
+            <div class="doc-line w-50"></div>
+            <div class="scan-line"></div>
+          </div>
+          <div class="scan-fields">
+            <div class="scan-chip"><span class="k">BOL No.</span><span class="v">DWTCICBHX3681210</span></div>
+            <div class="scan-chip"><span class="k">Carrier</span><span class="v">YML</span></div>
+            <div class="scan-chip"><span class="k">Container</span><span class="v">TGBU6390055</span></div>
+            <div class="scan-chip"><span class="k">Vendor</span><span class="v">GIANT (KUNSHAN)</span></div>
+          </div>
+        </div>
+
+        <!-- Stage 3: Sync to global network -->
+        <div class="flow-stage" data-i="2">
+          <div class="sync-flow">
+            <div class="sync-node sync-ours"><span class="sync-ic">📦</span>eShipping<br>System</div>
+            <div class="sync-wire">
+              <span class="packet p1"></span>
+              <span class="packet p2"></span>
+              <span class="packet p3"></span>
+            </div>
+            <div class="sync-node sync-global"><span class="sync-ic">🌐</span>Global Carrier<br>Network</div>
+          </div>
+          <div class="sync-return">&#10003; Live status received · Departure</div>
+        </div>
+
+        <!-- Stage 4: In transit -->
+        <div class="flow-stage" data-i="3">
+          <div class="track-map">
+            <svg class="track-svg" viewBox="0 0 620 300" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="trackGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#06AEEA"/>
+                  <stop offset="1" stop-color="#2CD1C1"/>
+                </linearGradient>
+              </defs>
+              <path class="route-bg" d="M 93 204 Q 310 150 527 96"/>
+              <path class="route-fg" d="M 93 204 Q 310 150 527 96"/>
+            </svg>
+            <div class="track-port origin"><span class="dot"></span><span class="lbl">Shanghai</span></div>
+            <div class="track-port dest"><span class="dot"></span><span class="lbl">Los Angeles</span></div>
+            <div class="track-ship">📦</div>
+          </div>
+        </div>
+
+        <!-- Stage 5: Auto status update -->
+        <div class="flow-stage" data-i="4">
+          <div class="upd-card">
+            <div class="upd-head"><span>BOL</span><span>Carrier</span><span>ETA</span><span>Status</span></div>
+            <div class="upd-row">
+              <span class="bol">DWTCICBHX3681210</span>
+              <span>YML</span>
+              <span>2022/06/07</span>
+              <span class="upd-badge-swap">
+                <span class="upd-badge b-prog">&#9679; In Progress</span>
+                <span class="upd-badge arrived b-arr">&#9679; Arrival</span>
+              </span>
+            </div>
+            <div class="upd-row">
+              <span class="bol">DWTCICBHX3681211</span>
+              <span>TACA</span>
+              <span>2022/06/09</span>
+              <span class="upd-badge">&#9679; In Progress</span>
+            </div>
+          </div>
+          <div class="upd-toast"><span class="tk">&#10003;</span>Status updated automatically</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SOLUTION ══ -->
+<section class="solution">
+  <div class="sec-inner">
+    <h2 class="sec-title fade-up">Leveraging AWS Cloud Technologies to<br>Automate Shipping Management</h2>
+    <div class="solution-body">
+      <div class="solution-list">
+        <div class="sol-item fade-up">
+          <div class="sol-title">
+            <div class="ic-check"></div>
+            <h3>API Gateway &amp; Lambda</h3>
+          </div>
+          <p class="sol-desc">Handles customer requests and triggers shipping data retrieval.</p>
+        </div>
+        <div class="sol-item fade-up delay-1">
+          <div class="sol-title">
+            <div class="ic-check"></div>
+            <h3>S3 Storage</h3>
+          </div>
+          <p class="sol-desc">Used for storing all shipping documents and related files.</p>
+        </div>
+        <div class="sol-item fade-up delay-2">
+          <div class="sol-title">
+            <div class="ic-check"></div>
+            <h3>AWS OCR</h3>
+          </div>
+          <p class="sol-desc">Automatically extracts key information from the bills of lading, such as shipping numbers and dates.</p>
+        </div>
+        <div class="sol-item fade-up delay-3">
+          <div class="sol-title">
+            <div class="ic-check"></div>
+            <h3>Frontend Technology</h3>
+          </div>
+          <p class="sol-desc">Built with React, providing users with a friendly interface to view real-time shipment statuses and receive instant updates.</p>
+        </div>
+      </div>
+      <div class="solution-visual fade-right">
+        <img src="uploads/eshipping/solution_aws.svg" alt="AWS Cloud Architecture" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RESULTS ══ -->
+<section class="results">
+  <div class="sec-inner">
+    <h2 class="sec-title fade-up">Streamlined Shipment Management and<br>Real-Time Visibility</h2>
+    <div class="results-grid">
+
+      <!-- Time-Saving -->
+      <div class="result-card fade-up">
+        <div class="result-circle">
+          <img src="uploads/eshipping/result_timesaving.svg" alt="Time-Saving" style="width:100%;height:100%;object-fit:contain;">
+        </div>
+        <div class="result-text">
+          <h3>Time-Saving</h3>
+          <p>Reduces the time spent on manual tracking and minimizes human error.</p>
+        </div>
+      </div>
+
+      <!-- Enhanced Workflow -->
+      <div class="result-card fade-up delay-1">
+        <div class="result-circle">
+          <img src="uploads/eshipping/result_workflow.svg" alt="Enhanced Workflow" style="width:100%;height:100%;object-fit:contain;">
+        </div>
+        <div class="result-text">
+          <h3>Enhanced Workflow</h3>
+          <p>Simplifies operations and reduces labor dependency, offering an intuitive, transparent shipment tracking platform.</p>
+        </div>
+      </div>
+
+      <!-- Efficiency Boost -->
+      <div class="result-card fade-up delay-2">
+        <div class="result-circle">
+          <img src="uploads/eshipping/result_efficiency.svg" alt="Efficiency Boost" style="width:100%;height:100%;object-fit:contain;">
+        </div>
+        <div class="result-text">
+          <h3>Efficiency Boost</h3>
+          <p>Clients can upload bills of lading, and the system automatically processes and provides real-time shipment updates.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ VOICES ══ -->
+<section class="voices">
+  <div class="voices-bg"></div>
+  <div class="voices-inner">
+    <div class="voices-label fade-left">Voices of<br>our customers</div>
+    <div class="voices-card fade-right">
+      <div class="quote-mark">"</div>
+      <p>BCT delivered a seamless app experience, perfectly balanced between function and creativity.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LET'S CONNECT ══ -->
+<section class="lets-connect" id="contact">
+  <div class="connect-dotted"></div>
+  <div class="connect-card fade-up">
+    <h2>Thinking about a project?<br>Let's connect!</h2>
+    <button class="btn-grad">Contact Us</button>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="uploads/ic_bct_logo_white.png" alt="Bahwan CyberTek">
+      <p>Bahwan CyberTek is a global technology company enabling digital transformation, delivering innovative solutions across 20+ countries.</p>
+      <div class="socials">
+        <a href="#" title="LinkedIn">in</a>
+        <a href="#" title="Twitter">𝕏</a>
+        <a href="#" title="Facebook">f</a>
+        <a href="#" title="Instagram">ig</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Insights</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Get In Touch</h4>
+      <div class="contact-line">📍 4790 Irvine Blvd, Ste 105, Irvine, CA 92620</div>
+      <div class="contact-line">📞 (888) 221-2710</div>
+      <div class="contact-line">✉️ info@bahwancybertek.com</div>
+    </div>
+  </div>
+  <div class="footer-divider">
+    <p>© 2024 Bahwan CyberTek Inc. All rights reserved.</p>
+    <div class="footer-regions">
+      USA · India · UAE · Oman · Singapore · Saudi Arabia · UK · Bahrain · Brunei · Malaysia
+    </div>
+  </div>
+</footer>
+
+<script>
+// Header scroll shadow
+const header = document.getElementById('top');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('scrolled', window.scrollY > 10);
+}, { passive: true });
+
+// Scroll-triggered animations
+function revealAnims() {
+  document.querySelectorAll('.fade-up,.fade-left,.fade-right').forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight + 60) el.classList.add('in');
+  });
+}
+requestAnimationFrame(revealAnims);
+window.addEventListener('load', revealAnims);
+window.addEventListener('scroll', revealAnims, { passive: true });
+
+// Hero dashboard carousel: Departure → Port → Clearance
+(function() {
+  const states = ['departure', 'port', 'clearance'];
+  const glows  = { departure: 'orange', port: 'blue', clearance: 'green' };
+  let cur = 0;
+  function step() {
+    document.querySelector('.hd-glow-' + glows[states[cur]])?.classList.remove('active');
+    document.querySelector('.hd-tag[data-state="' + states[cur] + '"]')?.classList.remove('active');
+    cur = (cur + 1) % states.length;
+    document.querySelector('.hd-glow-' + glows[states[cur]])?.classList.add('active');
+    document.querySelector('.hd-tag[data-state="' + states[cur] + '"]')?.classList.add('active');
+  }
+  setInterval(step, 3000);
+})();
+
+// App showcase flow: 5-step auto-play walkthrough
+(function() {
+  const steps  = document.querySelectorAll('.flow-step');
+  const stages = document.querySelectorAll('.flow-stage');
+  if (!steps.length) return;
+  let idx = 0, timer = null;
+  function activate(i) {
+    idx = i;
+    steps.forEach((s, n) => s.classList.toggle('active', n === i));
+    stages.forEach((s, n) => s.classList.toggle('active', n === i));
+  }
+  function play() {
+    clearInterval(timer);
+    timer = setInterval(() => activate((idx + 1) % steps.length), 5000);
+  }
+  steps.forEach((s, i) => s.addEventListener('click', () => { activate(i); play(); }));
+  // Start only when the section scrolls into view
+  const section = document.querySelector('.app-showcase');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { play(); } else { clearInterval(timer); }
+    });
+  }, { threshold: 0.25 });
+  if (section) io.observe(section);
+  activate(0);
+})();
+</script>
+</div><!-- /.page-wrap -->
+</body>
+</html>
