@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study — Consumer Account System | BCT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Design tokens — Figma "Case Studies 2025 / Giant ID (Consumer Account System)"
+   ============================================================ */
+:root{
+  --primary:      #04ACEB;   /* Primary Blue / cyan headings */
+  --deep:         #2E3841;   /* Deep Blue (body text) */
+  --dark:         #121212;   /* Dark (headings) */
+  --mid-gray:     #6D777F;   /* Mid Gray */
+  --water:        #93DCEC;   /* Water */
+  --grad-a:       #06AEEA;   /* Blue gradient start */
+  --grad-b:       #2CD1C1;   /* Blue gradient end   */
+  --royal:        #1E4FE6;   /* Royal blue blob     */
+  --royal-2:      #2563eb;
+  --white:        #ffffff;
+
+  /* Brand marks */
+  --fb:#1877F2; --line:#06C755; --google-r:#EA4335;
+
+  --glass-bg:     rgba(255,255,255,.7);
+  --glass-shadow: 0 8.8px 14px rgba(22,29,36,.08);
+  --header-h:     100px;
+  --nav-bg:       rgba(4,5,13,0.6);
+  --dim:          rgba(255,255,255,0.55);
+  --bg:           #04050d;
+  --card-radius:  24px;
+  --px:           80px;
+  --inner-w:      1280px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Poppins',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--white);
+  color:var(--deep);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+
+.grad-text,.cyan{
+  background:linear-gradient(90deg,var(--grad-a) 0%,var(--grad-b) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+
+/* Reveal-on-scroll */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.1s}.reveal.d2{transition-delay:.2s}
+.reveal.d3{transition-delay:.3s}.reveal.d4{transition-delay:.4s}
+
+/* ============================================================
+   BCT Pill Nav
+   ============================================================ */
+nav#nav{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  width:calc(100% - 80px);max-width:1320px;height:64px;
+  background:var(--nav-bg);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:50px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 12px 0 24px;z-index:200;transition:background .3s,border-color .3s;
+}
+nav#nav.scrolled{border-color:rgba(255,255,255,0.12)}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links a{
+  font-size:14px;font-weight:500;color:var(--dim);
+  padding:8px 16px;border-radius:50px;transition:color .2s,background .2s;
+}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,0.06)}
+.nav-work-wrap{position:relative}
+.nav-work-btn{
+  font-family:inherit;font-size:14px;font-weight:500;
+  color:var(--dim);background:none;border:none;cursor:pointer;
+  padding:8px 16px;border-radius:50px;display:flex;align-items:center;gap:5px;
+  transition:color .2s,background .2s;
+}
+.nav-work-btn svg{transition:transform .2s}
+.nav-work-wrap:hover .nav-work-btn,.nav-work-wrap.open .nav-work-btn{color:#fff;background:rgba(255,255,255,0.06)}
+.nav-work-wrap:hover .nav-work-btn svg,.nav-work-wrap.open .nav-work-btn svg{transform:rotate(180deg)}
+.nav-dropdown{
+  position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(-4px);
+  background:var(--nav-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:18px 0 8px;min-width:200px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease,visibility .18s;z-index:300;
+}
+.nav-work-wrap:hover .nav-dropdown,.nav-work-wrap.open .nav-dropdown{
+  opacity:1;visibility:visible;pointer-events:all;transform:translateX(-50%) translateY(0);
+}
+.nav-dropdown a{
+  display:block;text-align:center;padding:13px 20px;
+  font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:500;
+  color:rgba(255,255,255,0.45);white-space:nowrap;
+  transition:color .15s,background .15s;border-radius:10px;margin:0 6px;
+}
+.nav-dropdown a:hover{color:#fff;background:rgba(255,255,255,0.06)}
+.nav-dropdown a.current{color:var(--primary)}
+.nav-btn{
+  display:inline-flex;align-items:center;padding:10px 24px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;
+  font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;
+  box-shadow:0 0 24px rgba(37,99,235,0.35);transition:box-shadow .3s,transform .2s;
+}
+.nav-btn:hover{box-shadow:0 0 40px rgba(37,99,235,0.55);transform:scale(1.03)}
+
+/* ============================================================
+   Section scaffolding
+   ============================================================ */
+section{position:relative}
+.wrap{max-width:1280px;margin:0 auto;padding:0 80px}
+.t1{font-size:52px;font-weight:700;line-height:64px;color:var(--dark);text-align:center;letter-spacing:-.5px}
+.t2{font-size:40px;font-weight:700;line-height:52px;color:var(--dark)}
+.t2.center{text-align:center}
+.lead{font-size:18px;font-weight:400;line-height:30px;color:var(--mid-gray)}
+.c2{font-size:20px;font-weight:500;line-height:30px;color:var(--deep)}
+.c3{font-size:16px;font-weight:400;line-height:26px;color:var(--mid-gray)}
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.hero{padding:calc(var(--header-h) + 40px) 0 100px;text-align:center;background:#fff;overflow:hidden}
+.hero-sub{max-width:720px;margin:24px auto 0;font-size:20px;line-height:32px;color:var(--mid-gray);font-weight:400}
+
+/* Browser mockup (Figma slice) */
+.browser{
+  display:block;width:900px;max-width:92vw;height:auto;margin:56px auto 0;
+  border-radius:16px;box-shadow:0 40px 90px rgba(22,29,36,.18);
+  border:1px solid #ececf0;
+}
+.br-bar{display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #eef0f2;background:#fff}
+.br-dots{display:flex;gap:7px}
+.br-dots i{width:12px;height:12px;border-radius:50%}
+.br-dots i:nth-child(1){background:#ff5f57}.br-dots i:nth-child(2){background:#febc2e}.br-dots i:nth-child(3){background:#28c840}
+.br-nav{display:flex;gap:10px;color:#c2c8ce;font-size:16px}
+.br-brands{flex:1;display:flex;align-items:center;justify-content:center;gap:22px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-style:italic;color:#1a1a1a;font-size:15px;letter-spacing:.5px}
+.br-brands .b-liv{color:#00A9CE}
+.br-actions{display:flex;gap:16px;color:#c2c8ce;font-size:17px}
+.br-body{background:#f4f5f6;padding:24px}
+.pf-hero{
+  position:relative;height:150px;border-radius:14px;overflow:hidden;color:#fff;
+  background:linear-gradient(120deg,rgba(18,20,24,.86),rgba(18,20,24,.55)),
+    url('uploads/hero_glass_city_dark.jpg') center/cover no-repeat, #1c1e22;
+  padding:20px 24px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.pf-hero-top{display:flex;align-items:center;gap:14px}
+.pf-avatar{width:46px;height:46px;border-radius:50%;background:#e9edf1;display:flex;align-items:center;justify-content:center;font-size:22px;color:#8a94a0}
+.pf-name{font-size:17px;font-weight:600;line-height:1.2}
+.pf-id{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px}
+.pf-stats{display:flex;gap:10px}
+.pf-stat{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 14px;min-width:82px}
+.pf-stat .k{font-size:9px;letter-spacing:.6px;color:rgba(255,255,255,.55);text-transform:uppercase}
+.pf-stat .v{font-size:15px;font-weight:600;margin-top:2px}
+.pf-section{background:#fff;border-radius:14px;padding:22px 24px;margin-top:16px}
+.pf-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.pf-section-head h4{font-size:16px;font-weight:600;color:#1a1a1a}
+.pf-edit{border:1px solid #d9dde1;border-radius:20px;padding:5px 16px;font-size:12px;font-weight:500;color:#3a4149;background:#fff;cursor:pointer}
+.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pf-field{border:1px solid #e6e9ec;border-radius:10px;padding:12px 14px;background:#fff}
+.pf-field.muted{background:#f6f7f8;border-color:#eef0f2}
+.pf-field .fk{font-size:9px;letter-spacing:.5px;color:#9aa2ab;text-transform:uppercase}
+.pf-field .fk .req{color:#f43f5e}
+.pf-field .fv{font-size:13px;color:#2E3841;margin-top:6px;font-weight:500}
+.pf-field .fv.dash{color:#c2c8ce}
+.pf-contact{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pf-contact .pf-field{display:flex;align-items:center;justify-content:space-between}
+.pf-contact .fv{font-weight:400}
+.pf-contact .chev{color:#c2c8ce}
+.pf-addr-lbl{font-size:9px;letter-spacing:.6px;color:#9aa2ab;text-transform:uppercase;margin-top:20px}
+
+/* ============================================================
+   Soft page background
+   ============================================================ */
+.page-bg{
+  background:
+    radial-gradient(900px 700px at 12% 12%, rgba(147,220,236,.22), transparent 62%),
+    radial-gradient(1000px 800px at 90% 40%, rgba(44,209,193,.14), transparent 62%),
+    linear-gradient(180deg,#ffffff 0%,#f5fafc 30%,#f2f6f9 72%,#ffffff 100%);
+}
+
+/* ============================================================
+   Sec2 — Building a Secure, Multi-Login…
+   ============================================================ */
+.sec2{padding:110px 0}
+.sec2-grid{display:grid;grid-template-columns:1fr 520px;gap:72px;align-items:center}
+.sec2-copy p.c3{margin-top:26px;font-size:17px;line-height:28px}
+.stats{display:flex;gap:12px;margin-top:64px}
+.stat{flex:1;border-bottom:1.5px solid #d7dde2;padding-bottom:14px}
+.stat .num{font-size:44px;font-weight:700;color:var(--dark);line-height:1;letter-spacing:-1px}
+.stat .lbl{font-size:15px;color:var(--mid-gray);margin-top:14px}
+.sec2-visual{position:relative;display:flex;align-items:center;justify-content:center}
+.sec2-visual img{width:100%;max-width:520px;height:auto}
+.blue-blob{
+  position:absolute;right:-20px;top:0;width:440px;height:480px;z-index:0;
+  background:linear-gradient(150deg,var(--royal) 10%,#1435c9 90%);
+  border-radius:220px 40px 40px 220px;
+  box-shadow:0 40px 90px rgba(30,79,230,.35);
+  clip-path:ellipse(78% 62% at 62% 50%);
+}
+.mini-card{
+  position:absolute;left:0;top:40px;z-index:2;width:230px;height:150px;border-radius:14px;
+  overflow:hidden;color:#fff;padding:16px 18px;
+  background:linear-gradient(120deg,rgba(18,20,24,.9),rgba(18,20,24,.6)),
+    url('uploads/hero_glass_city_dark.jpg') center/cover no-repeat,#1c1e22;
+  box-shadow:0 24px 50px rgba(22,29,36,.28);
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.mini-card .mc-top{display:flex;align-items:center;gap:10px}
+.mini-card .mc-av{width:34px;height:34px;border-radius:50%;background:#e9edf1;display:flex;align-items:center;justify-content:center;color:#8a94a0;font-size:16px}
+.mini-card .mc-name{font-size:14px;font-weight:600}
+.mini-card .mc-id{font-size:10px;color:rgba(255,255,255,.55)}
+.mini-card .mc-rows{display:flex;flex-direction:column;gap:7px}
+.mini-card .mc-row .k{font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.mini-card .mc-row .v{font-size:12px;font-weight:600}
+.person{display:none}
+
+/* ============================================================
+   Sec3 — Advanced Features
+   ============================================================ */
+.sec3{padding:100px 0 120px}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:64px}
+.feat-card{
+  background:#fff;border-radius:var(--card-radius);padding:40px 40px 32px;
+  box-shadow:0 20px 60px rgba(22,29,36,.06);border:1px solid #eef1f4;
+  min-height:420px;display:flex;flex-direction:column;
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+.feat-card:hover{transform:translateY(-6px);box-shadow:0 30px 70px rgba(22,29,36,.1)}
+.feat-card h3{font-size:24px;font-weight:600;color:var(--dark)}
+.feat-card p{font-size:15px;line-height:24px;color:var(--mid-gray);margin-top:14px;max-width:460px}
+.feat-visual{flex:1;display:flex;align-items:center;justify-content:center;margin-top:24px;position:relative}
+.feat-visual img{width:100%;max-width:420px;height:auto}
+
+/* login form mock */
+.login-mock{position:relative;width:200px;background:#eceef0;border-radius:14px;padding:18px;box-shadow:0 16px 34px rgba(22,29,36,.12)}
+.login-mock .lm-in{height:26px;border-radius:6px;background:#fff;margin-bottom:10px;display:flex;align-items:center;padding:0 12px;gap:5px}
+.login-mock .lm-in i{width:4px;height:4px;border-radius:50%;background:#c2c8ce}
+.login-mock .lm-btn{height:30px;border-radius:6px;background:#151515;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.social-row{display:flex;gap:16px;justify-content:center;margin-top:-14px;position:relative;z-index:2}
+.social-ic{width:56px;height:56px;border-radius:50%;background:#fff;box-shadow:0 10px 24px rgba(22,29,36,.12);display:flex;align-items:center;justify-content:center}
+.social-ic svg{width:26px;height:26px}
+
+/* avatars */
+.avatars{position:relative;width:300px;height:180px}
+.av-c{position:absolute;border-radius:50%;background-size:cover;background-position:center;border:4px solid #fff;box-shadow:0 12px 30px rgba(22,29,36,.14)}
+.av-c.big{width:130px;height:130px;left:85px;top:0;background:radial-gradient(circle at 50% 40%,#c9a6f5,#a06fe0)}
+.av-c.l{width:96px;height:96px;left:0;top:64px;background:linear-gradient(135deg,#f38f7a,#e2624c)}
+.av-c.r{width:96px;height:96px;right:0;top:64px;background:linear-gradient(135deg,#f3c07a,#e29a4c)}
+.av-c span{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px}
+
+/* protocol shield */
+.proto{position:relative;width:280px;height:170px;display:flex;align-items:center;justify-content:center}
+.proto .p-shield{width:120px;filter:drop-shadow(0 16px 26px rgba(4,172,235,.35));z-index:2}
+.proto .p-badge{position:absolute;width:70px;height:70px;border-radius:50%;background:#fff;box-shadow:0 12px 26px rgba(22,29,36,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#3a4149;z-index:3}
+.proto .p-badge b{font-size:20px;line-height:1}
+.proto .p-openid{left:6px;top:26px}
+.proto .p-openid b{color:#F7931E}
+.proto .p-oauth{right:6px;top:44px}
+.proto .p-oauth b{color:#3a4149}
+
+/* data mgmt cluster */
+.datamgmt{position:relative;width:300px;height:200px}
+.dm-photo{position:absolute;left:96px;top:20px;width:150px;height:150px;border-radius:50%;overflow:hidden;border:4px solid #fff;box-shadow:0 14px 30px rgba(22,29,36,.16);background:radial-gradient(circle at 40% 30%,#5a6b74,#2b333a 70%);display:flex;align-items:center;justify-content:center;font-size:52px}
+.dm-bubble{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 22px rgba(22,29,36,.16);border:3px solid #fff}
+.dm-bubble.b1{width:60px;height:60px;left:80px;top:0;background:#4aa3ff;font-size:26px}
+.dm-bubble.b2{width:52px;height:52px;left:44px;top:64px;background:#ff9f2e;font-size:22px}
+.dm-bubble.b3{width:64px;height:64px;left:96px;top:130px;background:#2ec16b;font-size:26px}
+.dm-bubble.b4{width:56px;height:56px;right:40px;top:120px;background:#e26a4c;font-size:22px}
+.dm-bubble.b5{width:44px;height:44px;right:20px;top:56px;background:#f6c945;font-size:18px}
+.dm-bubble.b6{width:40px;height:40px;left:30px;top:10px;background:#8a94a0;font-size:16px}
+
+/* ============================================================
+   UIKit blue band
+   ============================================================ */
+.uikit{
+  position:relative;overflow:hidden;
+  background:url('uploads/gid/img_uikit_bk.svg') center/cover no-repeat,#1e4fe6;
+}
+.uikit-inner{position:relative;z-index:2;max-width:1452px;margin:0 auto;padding:64px 40px;
+  display:flex;align-items:center;justify-content:center}
+.uikit-art{display:block;width:100%;max-width:1452px;height:auto;margin:0 auto}
+.phone{width:230px;background:#fff;border-radius:30px;padding:12px;box-shadow:0 40px 90px rgba(9,26,80,.4);flex:none}
+.phone .ph-notch{width:70px;height:6px;border-radius:6px;background:#e6e9ec;margin:6px auto 14px}
+.phone .ph-screen{border-radius:20px;overflow:hidden;background:#f6f7f8;padding:18px 16px 22px}
+.phone h5{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:14px}
+.phone .ph-in{height:34px;border-radius:8px;border:1px solid #e6e9ec;background:#fff;margin-bottom:10px;display:flex;align-items:center;padding:0 12px;gap:5px}
+.phone .ph-in i{width:4px;height:4px;border-radius:50%;background:#c2c8ce}
+.phone .ph-btn{height:40px;border-radius:8px;background:#151515;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:4px 0 16px}
+.phone .ph-or{text-align:center;font-size:11px;color:#9aa2ab;margin-bottom:14px}
+.phone .ph-social{display:flex;gap:10px;justify-content:center}
+.phone .ph-social span{width:40px;height:40px;border-radius:10px;border:1px solid #eef0f2;display:flex;align-items:center;justify-content:center}
+.phone .ph-social svg{width:20px;height:20px}
+.uikit-card{
+  flex:none;width:340px;background:rgba(255,255,255,.1);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:28px 30px;color:#fff;
+}
+.uikit-card h3{font-size:26px;font-weight:600;line-height:36px}
+.uikit-card p{font-size:15px;line-height:24px;color:rgba(255,255,255,.82);margin-top:14px}
+
+/* ============================================================
+   Sec5 — Future-Ready Integration
+   ============================================================ */
+.sec5{padding:110px 0 120px;text-align:center;overflow:hidden}
+.sec5 .grid-bg{
+  position:absolute;left:0;right:0;top:0;height:1024px;z-index:0;pointer-events:none;
+  background:url('uploads/gid/img_grid_bk.svg') center top/cover no-repeat;
+}
+.sec5 .beam-field{
+  position:absolute;left:0;right:0;top:0;height:1024px;width:100%;
+  z-index:0;pointer-events:none;overflow:visible;
+}
+.sec5 .inner{position:relative;z-index:1}
+.sec5 h2{max-width:820px;margin:0 auto}
+.identity{position:relative;width:100%;max-width:600px;margin:36px auto 0}
+.identity img{width:100%;height:auto}
+.id-diagram{position:relative;width:420px;height:340px;margin:0 auto}
+.id-win{position:absolute;background:#fff;border:1px solid #e6e9ec;border-radius:12px;box-shadow:0 20px 50px rgba(22,29,36,.12)}
+.id-win .bar{height:22px;border-bottom:1px solid #eef0f2;display:flex;gap:5px;align-items:center;padding:0 10px}
+.id-win .bar i{width:6px;height:6px;border-radius:50%;background:#dfe3e7}
+.id-back1{width:150px;height:120px;left:30px;top:10px;opacity:.7}
+.id-back2{width:150px;height:120px;right:20px;bottom:0;opacity:.7}
+.id-main{width:250px;height:200px;left:85px;top:60px;z-index:3;
+  background:linear-gradient(180deg,#ffffff,#eef6ff)}
+.id-main .body{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100% - 22px);gap:14px}
+.id-user{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6ea8ff,#3a63e0);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff}
+.id-pass{width:130px;height:26px;border-radius:6px;background:#fff;border:1px solid #dfe6f2;display:flex;align-items:center;gap:5px;padding:0 12px}
+.id-pass i{width:5px;height:5px;border-radius:50%;background:#9db4de}
+.id-lock{position:absolute;right:24px;top:26px;font-size:52px;z-index:4;filter:drop-shadow(0 10px 20px rgba(90,120,200,.3))}
+.id-shield{position:absolute;left:20px;bottom:20px;width:90px;z-index:5;filter:drop-shadow(0 14px 24px rgba(4,172,235,.3))}
+.id-dot{position:absolute;width:12px;height:12px;border-radius:50%;z-index:2}
+.sec5 .id-sub{max-width:640px;margin:36px auto 0}
+
+/* ============================================================
+   Voices of our customers  (matches eshipping.html)
+   ============================================================ */
+.voices{height:640px;overflow:hidden;display:flex;align-items:center;position:relative}
+.voices-bg{
+  position:absolute;inset:0;
+  background:url('uploads/datalake/voices_bg.jpg') center/cover no-repeat;
+}
+.voices-bg::after{
+  content:'';position:absolute;inset:0;
+  background:rgba(0,0,0,.25);
+  backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+}
+.voices-inner{
+  position:relative;z-index:2;width:100%;max-width:1280px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 519px;gap:24px;align-items:center;
+  padding:0 80px;
+}
+.voices h2{
+  font-size:40px;font-weight:600;line-height:60px;color:#fff;
+  text-shadow:0 4px 8px rgba(0,0,0,.2);
+}
+.quote-card{
+  position:relative;background:#fff;padding:44px;
+  box-shadow:0 4px 24px rgba(0,0,0,.2);
+  display:flex;flex-direction:column;gap:24px;
+}
+.quote-card .qmark{
+  position:absolute;top:-22px;left:22px;width:50px;height:44px;
+}
+.quote-card blockquote{
+  font-size:28px;font-weight:500;line-height:44px;letter-spacing:.28px;color:var(--dark);
+}
+.quote-card .q-name{font-size:16px;font-weight:700;line-height:16px;color:var(--dark)}
+.quote-card .q-role{font-size:16px;line-height:24px;color:var(--mid-gray);margin-top:4px}
+
+/* ── scroll animations (matches eshipping.html) ── */
+.fade-up{opacity:0;transform:translateY(32px);transition:opacity .6s ease,transform .6s ease}
+.fade-up.in{opacity:1;transform:translateY(0)}
+.fade-left{opacity:0;transform:translateX(-32px);transition:opacity .6s ease,transform .6s ease}
+.fade-left.in{opacity:1;transform:translateX(0)}
+.fade-right{opacity:0;transform:translateX(32px);transition:opacity .6s ease,transform .6s ease}
+.fade-right.in{opacity:1;transform:translateX(0)}
+.delay-1{transition-delay:.1s}.delay-2{transition-delay:.2s}
+.delay-3{transition-delay:.3s}.delay-4{transition-delay:.4s}
+
+/* ============================================================
+   Footer  (matches eshipping.html)
+   ============================================================ */
+footer{
+  background:var(--bg);
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding:64px var(--px) 32px;
+  font-family:'Poppins',sans-serif;
+}
+.footer-grid{
+  max-width:calc(var(--inner-w) + var(--px)*2);
+  margin:0 auto 48px;
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:40px;
+}
+.f-brand{margin-bottom:16px}
+.f-desc{font-size:13px;color:rgba(255,255,255,0.32);line-height:20px}
+.f-col h4{
+  font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:1px;
+  color:rgba(255,255,255,0.35);margin-bottom:16px;
+}
+.f-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.f-links a{font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color .2s}
+.f-links a:hover{color:#fff}
+.footer-btm{
+  max-width:calc(var(--inner-w) + var(--px)*2);
+  margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;
+  border-top:1px solid rgba(255,255,255,0.07);padding-top:24px;
+}
+.f-copy,.f-parent{font-size:12px;color:rgba(255,255,255,0.28)}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width:1180px){
+  .nav-links{display:none}
+  .wrap{padding:0 32px}
+  .sec2-grid{grid-template-columns:1fr;gap:48px}
+  .sec2-visual{height:420px}
+  .feat-grid{grid-template-columns:1fr}
+  .uikit{height:auto;padding:70px 0}
+  .uikit-inner{flex-direction:column}
+  .voices-inner{grid-template-columns:1fr;gap:36px;padding:48px 32px}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
+  .t1{font-size:38px;line-height:48px}
+  .t2{font-size:30px;line-height:42px}
+}
+@media (max-width:560px){
+  .pf-grid{grid-template-columns:1fr}
+  .pf-contact{grid-template-columns:1fr}
+  .stats{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= Nav ================= -->
+<nav id="nav">
+  <a href="BCT Taipei Dark.html" class="nav-logo">
+    <img src="uploads/ic_bct_logo_white.png" alt="Bahwan CyberTek" style="height:34px;width:auto">
+  </a>
+  <div class="nav-links">
+    <a href="BCT Taipei Dark.html#about">About</a>
+    <a href="BCT Taipei Dark.html#services">Services</a>
+    <a href="BCT Taipei Dark.html#process">Process</a>
+    <div class="nav-work-wrap" id="navWorkWrap">
+      <button class="nav-work-btn" aria-haspopup="true" aria-expanded="false">
+        Work
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,4 6,8 10,4"/></svg>
+      </button>
+      <div class="nav-dropdown" role="menu">
+        <a href="https://dev.bct-nova.net/" target="_blank" rel="noopener noreferrer" role="menuitem">NOVA</a>
+        <a href="fitting.html" role="menuitem">Dynamic Cycling Fit</a>
+        <a href="../flir/flir.html" role="menuitem">FLIR</a>
+        <a href="DataLake.html" role="menuitem">DataLake</a>
+        <a href="eshipping.html" role="menuitem">eShipping</a>
+        <a href="gid.html" role="menuitem" class="current">Account System</a>
+        <a href="gac.html" role="menuitem" style="display:none">GAC</a>
+      </div>
+    </div>
+  </div>
+  <a href="BCT Taipei Dark.html#cta" class="nav-btn">Contact Us</a>
+</nav>
+
+<!-- ================= Hero ================= -->
+<section class="hero" id="hero">
+  <h1 class="t1 reveal in">Design and Implementation of a<br><span class="cyan">Consumer Account System</span></h1>
+  <p class="hero-sub reveal in d1">We created a consumer account system that centralizes user data, improves experience, offers multiple logins, and ensures secure integration.</p>
+
+  <!-- Browser mockup (Figma slice) -->
+  <img class="browser reveal d2" src="uploads/gid/img_hero_browser.png" alt="Giant ID consumer account profile page">
+
+</section>
+
+<div class="page-bg">
+
+<!-- ================= Sec2 — Building a Secure, Multi-Login ================= -->
+<section class="sec2">
+  <div class="wrap">
+    <div class="sec2-grid">
+      <div class="sec2-copy">
+        <h2 class="t2 reveal">Building a Secure, Multi-Login Consumer Account System</h2>
+        <p class="c3 reveal d1">To establish a robust and secure consumer account system that supports multiple login methods and centralizes user data management. The system must adhere to industry-standard authentication protocols to enable seamless integration with other systems.</p>
+        <div class="stats reveal d2">
+          <div class="stat"><div class="num">600K</div><div class="lbl">User Count</div></div>
+          <div class="stat"><div class="num">10+</div><div class="lbl">Supported Nations</div></div>
+          <div class="stat"><div class="num">4.8</div><div class="lbl">Rating</div></div>
+        </div>
+      </div>
+      <div class="sec2-visual reveal d2">
+        <img src="uploads/gid/img_account_system.png" alt="Consumer account profile card with user">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Sec3 — Advanced Features ================= -->
+<section class="sec3" id="features">
+  <div class="wrap">
+    <h2 class="t2 center reveal">Advanced Features of Our<br>Comprehensive User Account System</h2>
+    <div class="feat-grid">
+
+      <!-- Card 1 -->
+      <div class="feat-card reveal">
+        <h3>Multiple Login Methods</h3>
+        <p>Supports traditional login and integrates with social login options like Facebook, Google, LINE, and Apple ID to enhance user convenience.</p>
+        <div class="feat-visual">
+          <img src="uploads/gid/img_multiple_login.svg" alt="Login form with Facebook, Google, LINE and Apple sign-in">
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="feat-card reveal d1">
+        <h3>Unique Identifier</h3>
+        <p>Each user is assigned a unique identifier upon registration, used for subsequent data binding and operations.</p>
+        <div class="feat-visual">
+          <img src="uploads/gid/img_unique_identifier.png" alt="Three users representing unique identifiers">
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="feat-card reveal d2">
+        <h3>Protocol Compliance</h3>
+        <p>Adheres to OAuth and OpenID Connect (OIDC) protocols for secure and standardized authentication, while leveraging OIDC for secure system integration and data exchange.</p>
+        <div class="feat-visual">
+          <img src="uploads/gid/img_protocol_compliance.svg" alt="OpenID and OAuth protocol compliance shield">
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="feat-card reveal d3">
+        <h3>User Data Management</h3>
+        <p>Manages and securely stores personal data, including name, phone number, and physical information, ensuring privacy protection and sharing only under authorized conditions.</p>
+        <div class="feat-visual">
+          <img src="uploads/gid/img_user_data_management.png" alt="Personal data managed securely around a user">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= UIKit blue band (Figma slice) ================= -->
+<section class="uikit">
+  <div class="uikit-inner">
+    <img class="uikit-art reveal" src="uploads/gid/img_uikit.png" alt="Sign-in, social login and profile UI kit screens">
+  </div>
+</section>
+
+<!-- ================= Sec5 — Future-Ready Integration ================= -->
+<section class="sec5">
+  <div class="grid-bg" aria-hidden="true"></div>
+  <svg class="beam-field" id="beamField" viewBox="0 0 1440 1024" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <div class="inner">
+    <h2 class="t2 center reveal">Future-Ready Integration: <span class="cyan">Centralizing Identity Management</span> Across Services</h2>
+    <div class="identity reveal d1">
+      <img src="uploads/gid/img_identity.svg" alt="Centralized identity management diagram">
+    </div>
+    <p class="c3 id-sub reveal d2">This account system will serve as the core identity management platform for other services, allowing for integration with multiple external systems in the future to provide unified authentication and user data management.</p>
+  </div>
+</section>
+
+</div><!-- /page-bg -->
+
+<!-- ══ VOICES ══ -->
+<section class="voices" id="voices">
+  <div class="voices-bg" aria-hidden="true"></div>
+  <div class="voices-inner">
+    <h2 class="fade-left">Voices of<br>our customers</h2>
+    <div class="quote-card fade-right">
+      <img class="qmark" src="uploads/datalake/quote.svg" alt="" aria-hidden="true">
+      <blockquote>The BCT team showed a great balance between app development while ensuring the app was developed with real life adaptation.</blockquote>
+      <div>
+        <p class="q-name">Rasmus Yu Limschou</p>
+        <p class="q-role">Global Head of Digital Transformation, Giant Group</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="f-brand"><img src="uploads/ic_bct_logo_white.png" alt="Bahwan CyberTek" style="height:28px;width:auto;opacity:0.7"></div>
+      <p class="f-desc">Global digital transformation. Delivering innovative technology since 1999.</p>
+    </div>
+    <div class="f-col"><h4>Services</h4><ul class="f-links">
+      <li><a href="#">AI Application</a></li>
+      <li><a href="#">Data Platform</a></li>
+      <li><a href="#">Cloud Services</a></li>
+      <li><a href="#">UI / UX Design</a></li>
+      <li><a href="#">Mobile &amp; Web Apps</a></li>
+    </ul></div>
+    <div class="f-col"><h4>Company</h4><ul class="f-links">
+      <li><a href="#">About Us</a></li>
+      <li><a href="#">Our Process</a></li>
+      <li><a href="BCT Taipei Dark.html#cases">Case Studies</a></li>
+      <li><a href="#">Careers</a></li>
+    </ul></div>
+    <div class="f-col"><h4>Contact</h4><ul class="f-links">
+      <li><a href="#">hello@bcttaipei.com</a></li>
+      <li><a href="#">LinkedIn</a></li>
+      <li><a href="#">Taipei, Taiwan</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-btm">
+    <div class="f-copy">© 2026 BCT Taipei. All rights reserved.</div>
+    <div class="f-parent">Bahwan CyberTek Group</div>
+  </div>
+</footer>
+
+<script>
+/* Reveal on scroll */
+(function(){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:.16});
+  document.querySelectorAll('.reveal,.fade-up,.fade-left,.fade-right').forEach(function(el){ io.observe(el); });
+})();
+
+/* Nav scroll + dropdown */
+(function(){
+  var nav = document.getElementById('nav');
+  window.addEventListener('scroll', function(){
+    var scrolled = window.scrollY > 80;
+    nav.classList.toggle('scrolled', scrolled);
+    document.documentElement.style.setProperty('--nav-bg', scrolled ? 'rgba(4,5,13,0.85)' : 'rgba(4,5,13,0.6)');
+  }, {passive:true});
+
+  var w = document.getElementById('navWorkWrap');
+  w.querySelector('.nav-work-btn').addEventListener('click', function(e){
+    e.stopPropagation();
+    var open = w.classList.toggle('open');
+    this.setAttribute('aria-expanded', open);
+  });
+  document.addEventListener('click', function(){
+    w.classList.remove('open');
+    w.querySelector('.nav-work-btn').setAttribute('aria-expanded', false);
+  });
+})();
+
+/* ============================================================
+   Sec5 — grid beams flying in toward the central diagram
+   ============================================================ */
+(function buildBeams(){
+  var svg = document.getElementById('beamField');
+  if (!svg) return;
+  var NS = 'http://www.w3.org/2000/svg';
+  var DUR = 2.7;   // seconds per beam cycle
+  var CL  = 360;   // comet tail length (user units)
+  // outer point -> inner point (behind the centered diagram), colour, start delay
+  var beams = [
+    {x1:150, y1:250, x2:648, y2:472, c:'#3FD0E6', b:0.0},
+    {x1:108, y1:548, x2:616, y2:508, c:'#2563EB', b:0.9},
+    {x1:246, y1:816, x2:658, y2:560, c:'#2CD1C1', b:1.7},
+    {x1:1300,y1:398, x2:800, y2:482, c:'#2CD1C1', b:0.45},
+    {x1:1326,y1:642, x2:822, y2:520, c:'#4AA3FF', b:1.3},
+    {x1:1330,y1:800, x2:800, y2:560, c:'#1E4FE6', b:2.1}
+  ];
+  var defs = document.createElementNS(NS,'defs');
+  svg.appendChild(defs);
+
+  beams.forEach(function(bm, i){
+    var dx = bm.x2 - bm.x1, dy = bm.y2 - bm.y1;
+    var dist = Math.hypot(dx, dy);
+    var ang  = Math.atan2(dy, dx) * 180 / Math.PI;
+
+    // gradient: transparent tail -> solid head (along the comet's local +x)
+    var grad = document.createElementNS(NS,'linearGradient');
+    grad.setAttribute('id','beamG'+i);
+    grad.setAttribute('x1','0');grad.setAttribute('x2','1');
+    grad.setAttribute('y1','0');grad.setAttribute('y2','0');
+    grad.innerHTML =
+      '<stop offset="0" stop-color="'+bm.c+'" stop-opacity="0"/>'+
+      '<stop offset="0.45" stop-color="'+bm.c+'" stop-opacity="0.2"/>'+
+      '<stop offset="0.8" stop-color="'+bm.c+'" stop-opacity="0.55"/>'+
+      '<stop offset="1" stop-color="'+bm.c+'"/>';
+    defs.appendChild(grad);
+
+    var g = document.createElementNS(NS,'g');
+    g.setAttribute('transform','translate('+bm.x1+' '+bm.y1+') rotate('+ang.toFixed(3)+')');
+
+    // comet head at local origin, tail trailing back to -CL (outside the frame at start)
+    g.innerHTML =
+      '<line x1="'+(-CL)+'" y1="0" x2="0" y2="0" stroke="url(#beamG'+i+')" stroke-width="3" stroke-linecap="round"/>'+
+      '<circle cx="0" cy="0" r="13" fill="'+bm.c+'" opacity="0.22"/>'+
+      '<circle cx="0" cy="0" r="6.5" fill="'+bm.c+'"/>'+
+      // head travels outer -> inner, holds, then a short gap before repeating
+      '<animateTransform attributeName="transform" type="translate" additive="sum" '+
+        'values="0 0; '+dist.toFixed(1)+' 0; '+dist.toFixed(1)+' 0" '+
+        'keyTimes="0;0.8;1" dur="'+DUR+'s" begin="'+bm.b+'s" '+
+        'calcMode="spline" keySplines="0.35 0 0.25 1;0 0 1 1" repeatCount="indefinite"/>'+
+      // fade in from the grid, fade out before reaching centre (disappears behind the diagram)
+      '<animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;0.12;0.68;0.84;1" '+
+        'dur="'+DUR+'s" begin="'+bm.b+'s" repeatCount="indefinite"/>';
+    svg.appendChild(g);
+  });
+
+  // respect reduced-motion
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    if (svg.pauseAnimations) svg.pauseAnimations();
+  }
+})();
+</script>
+</body>
+</html>
