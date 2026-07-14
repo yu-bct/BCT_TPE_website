@@ -161,7 +161,7 @@ section{position:relative}
 .fly-fill{
   position:absolute; z-index:4; left:var(--ex); top:var(--ey); width:var(--w);
   height:auto; pointer-events:none; transform-origin:50% 50%;
-  animation:fillFlyIn 1.15s cubic-bezier(.2,.82,.24,1) var(--delay) both;
+  animation:fillFlyIn 1.3s cubic-bezier(.2,.82,.24,1) var(--delay) both;
 }
 @keyframes fillFlyIn{
   0%  {opacity:0; transform:translate(var(--sx),var(--sy)) rotate(var(--sr)) scale(.96);
@@ -537,13 +537,17 @@ footer{
   <h1 class="t1 reveal in">Design and Implementation of a<br><span class="cyan">Consumer Account System</span></h1>
   <p class="hero-sub reveal in d1">We created a consumer account system that centralizes user data, improves experience, offers multiple logins, and ensures secure integration.</p>
 
-  <!-- Browser mockup (empty-slot version) + field slices that fly in to fill it -->
+  <!-- Browser mockup (empty-slot version) + field slices that fly in from outside to fill it -->
   <div class="hero-stage">
     <img class="browser" src="uploads/gid/img_hero_browser_gaps.png" alt="Giant ID consumer account profile page">
     <img class="fly-fill" src="uploads/gid/field_name.png"   alt="" aria-hidden="true"
-         style="--ex:17.5%;--ey:46.8%;--w:21.5%;--sx:-175px;--sy:-160px;--sr:-10deg;--delay:.85s">
+         style="--ex:17.5%;--ey:46.8%;--w:21.5%;--sx:-400px;--sy:-230px;--sr:-10deg;--delay:.8s">
     <img class="fly-fill" src="uploads/gid/field_gender.png" alt="" aria-hidden="true"
-         style="--ex:61.5%;--ey:46.8%;--w:21.6%;--sx:190px;--sy:-165px;--sr:9deg;--delay:1s">
+         style="--ex:61.5%;--ey:46.8%;--w:21.6%;--sx:430px;--sy:-250px;--sr:9deg;--delay:.95s">
+    <img class="fly-fill" src="uploads/gid/field_email.png"  alt="" aria-hidden="true"
+         style="--ex:17.7%;--ey:85.6%;--w:31.6%;--sx:-470px;--sy:40px;--sr:-7deg;--delay:1.1s">
+    <img class="fly-fill" src="uploads/gid/field_edit.png"   alt="" aria-hidden="true"
+         style="--ex:76.2%;--ey:78.1%;--w:6.4%;--sx:430px;--sy:-80px;--sr:6deg;--delay:1.25s">
   </div>
 
 </section>
