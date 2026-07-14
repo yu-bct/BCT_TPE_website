@@ -135,9 +135,12 @@ section{position:relative}
 .hero{padding:calc(var(--header-h) + 40px) 0 100px;text-align:center;background:#fff;overflow:hidden}
 .hero-sub{max-width:720px;margin:24px auto 0;font-size:20px;line-height:32px;color:var(--mid-gray);font-weight:400}
 
+/* Hero stage — holds the browser + the flying field chips */
+.hero-stage{position:relative;width:900px;max-width:92vw;margin:56px auto 0}
+
 /* Browser mockup (Figma slice) — flies up into place */
 .browser{
-  display:block;width:900px;max-width:92vw;height:auto;margin:56px auto 0;
+  display:block;width:100%;height:auto;margin:0;
   border-radius:16px;
   border:1px solid rgba(0,0,0,.1);
   box-shadow:
@@ -152,6 +155,22 @@ section{position:relative}
 @keyframes browserFlyIn{
   from{opacity:0;transform:translateY(220px) scale(.94)}
   to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* Field slices that fly in from outside and fill the empty profile slots */
+.fly-fill{
+  position:absolute; z-index:4; left:var(--ex); top:var(--ey); width:var(--w);
+  height:auto; pointer-events:none; transform-origin:50% 50%;
+  animation:fillFlyIn 1.15s cubic-bezier(.2,.82,.24,1) var(--delay) both;
+}
+@keyframes fillFlyIn{
+  0%  {opacity:0; transform:translate(var(--sx),var(--sy)) rotate(var(--sr)) scale(.96);
+       filter:drop-shadow(0 16px 30px rgba(22,29,36,.20))}
+  16% {opacity:1}
+  70% {transform:translate(0,0) rotate(0deg) scale(1);
+       filter:drop-shadow(0 3px 8px rgba(22,29,36,.06))}
+  100%{opacity:1; transform:translate(0,0) rotate(0deg) scale(1);
+       filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
 }
 .br-bar{display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #eef0f2;background:#fff}
 .br-dots{display:flex;gap:7px}
@@ -518,8 +537,14 @@ footer{
   <h1 class="t1 reveal in">Design and Implementation of a<br><span class="cyan">Consumer Account System</span></h1>
   <p class="hero-sub reveal in d1">We created a consumer account system that centralizes user data, improves experience, offers multiple logins, and ensures secure integration.</p>
 
-  <!-- Browser mockup (Figma slice) -->
-  <img class="browser" src="uploads/gid/img_hero_browser.png" alt="Giant ID consumer account profile page">
+  <!-- Browser mockup (empty-slot version) + field slices that fly in to fill it -->
+  <div class="hero-stage">
+    <img class="browser" src="uploads/gid/img_hero_browser_gaps.png" alt="Giant ID consumer account profile page">
+    <img class="fly-fill" src="uploads/gid/field_name.png"   alt="" aria-hidden="true"
+         style="--ex:17.5%;--ey:46.8%;--w:21.5%;--sx:-175px;--sy:-160px;--sr:-10deg;--delay:.85s">
+    <img class="fly-fill" src="uploads/gid/field_gender.png" alt="" aria-hidden="true"
+         style="--ex:61.5%;--ey:46.8%;--w:21.6%;--sx:190px;--sy:-165px;--sr:9deg;--delay:1s">
+  </div>
 
 </section>
 
