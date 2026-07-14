@@ -144,10 +144,9 @@ section{position:relative}
   border-radius:16px;
   border:1px solid rgba(0,0,0,.1);
   box-shadow:
-    0 12px 27px rgba(171,171,171,.10),
-    0 49px 49px rgba(171,171,171,.09),
-    0 110px 66px rgba(171,171,171,.05),
-    0 196px 78px rgba(171,171,171,.01);
+    0 6px 14px rgba(171,171,171,.10),
+    0 16px 24px rgba(171,171,171,.08),
+    0 34px 40px rgba(171,171,171,.05);
   will-change:transform,opacity;
   /* above-the-fold: fly in on page load (no scroll observer needed) */
   animation:browserFlyIn 1s cubic-bezier(.16,.84,.30,1.02) .2s both;
@@ -317,12 +316,13 @@ section{position:relative}
    UIKit blue band
    ============================================================ */
 .uikit{
-  position:relative;overflow:hidden;
+  position:relative;overflow:hidden;height:780px;
   background:url('uploads/gid/img_uikit_bk.svg') center/cover no-repeat,#1e4fe6;
 }
-.uikit-inner{position:relative;z-index:2;max-width:1452px;margin:0 auto;padding:64px 40px;
+.uikit-inner{position:relative;z-index:2;height:100%;max-width:1452px;margin:0 auto;padding:56px 40px;
   display:flex;align-items:center;justify-content:center}
 .uikit-art{display:block;width:100%;max-width:1452px;height:auto;margin:0 auto}
+.uikit-bike{position:absolute;left:0;bottom:0;z-index:2;width:300px;max-width:26vw;height:auto;pointer-events:none}
 .phone{width:230px;background:#fff;border-radius:30px;padding:12px;box-shadow:0 40px 90px rgba(9,26,80,.4);flex:none}
 .phone .ph-notch{width:70px;height:6px;border-radius:6px;background:#e6e9ec;margin:6px auto 14px}
 .phone .ph-screen{border-radius:20px;overflow:hidden;background:#f6f7f8;padding:18px 16px 22px}
@@ -464,6 +464,7 @@ footer{
   .feat-grid{grid-template-columns:1fr}
   .uikit{height:auto;padding:70px 0}
   .uikit-inner{flex-direction:column}
+  .uikit-bike{display:none}
   .voices-inner{grid-template-columns:1fr;gap:36px;padding:48px 32px}
   .footer-grid{grid-template-columns:1fr 1fr;gap:28px}
   .t1{font-size:38px;line-height:48px}
@@ -625,6 +626,7 @@ footer{
   <div class="uikit-inner">
     <img class="uikit-art reveal" src="uploads/gid/img_uikit.png" alt="Sign-in, social login and profile UI kit screens">
   </div>
+  <img class="uikit-bike" src="uploads/gid/img_uikit_bike.png" alt="" aria-hidden="true">
 </section>
 
 <!-- ================= Sec5 — Future-Ready Integration ================= -->
