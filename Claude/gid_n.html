@@ -132,8 +132,14 @@ section{position:relative}
 /* ============================================================
    Hero
    ============================================================ */
-.hero{padding:calc(var(--header-h) + 40px) 0 100px;text-align:center;background:#fff;overflow:hidden}
-.hero-sub{max-width:720px;margin:24px auto 0;font-size:20px;line-height:32px;color:var(--mid-gray);font-weight:400}
+.hero{position:relative;padding:calc(var(--header-h) + 80px) 0 100px;text-align:center;background:#fff;overflow:hidden}
+.hero-sub{max-width:800px;margin:24px auto 0;font-size:20px;line-height:32px;color:var(--mid-gray);font-weight:400}
+
+/* Hero full-bleed background video (from prompt) + readability scrim */
+.hero-bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.hero-scrim{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg, rgba(255, 255, 255, .2) 0%, rgba(255, 255, 255, 0.4) 85%, rgba(255, 255, 255, 1) 100%)}
+.hero .t1,.hero .hero-sub,.hero .hero-stage{position:relative;z-index:1}
 
 /* Hero stage — holds the browser + the flying field chips */
 .hero-stage{position:relative;width:900px;max-width:92vw;margin:56px auto 0}
@@ -374,6 +380,72 @@ section{position:relative}
 .id-dot{position:absolute;width:12px;height:12px;border-radius:50%;z-index:2}
 .sec5 .id-sub{max-width:640px;margin:36px auto 0}
 
+/* ---- Sec5 · 3D Identity scene (replaces img_identity.svg) ---- */
+.id-scene{position:relative;width:600px;max-width:100%;height:460px;margin:24px auto 0;
+  perspective:1600px;perspective-origin:50% 42%}
+.id-stage{position:absolute;inset:0;transform-style:preserve-3d;
+  transform:rotateX(6deg) rotateY(-17deg);
+  animation:id3-orbit 14s ease-in-out infinite alternate}
+@keyframes id3-orbit{
+  0%{transform:rotateX(6deg) rotateY(-17deg)}
+  100%{transform:rotateX(4deg) rotateY(-11deg)}
+}
+.id-stage>*{position:absolute;transform-style:preserve-3d;will-change:transform}
+.id3-float{animation:id3-float 6s ease-in-out infinite}
+@keyframes id3-float{0%,100%{translate:0 0}50%{translate:0 -10px}}
+
+/* generic 3D card with extruded edge */
+.id3-card{background:linear-gradient(160deg,#ffffff,#eef4fc);
+  border:1px solid #e6ecf3;border-radius:14px;overflow:hidden;
+  box-shadow:0 1px 0 #e4eaf1,0 2px 0 #dde5ee,0 3px 0 #d6dfe9,0 4px 0 #cfd9e5,
+    0 6px 0 #c6d2e0,0 8px 0 #bccadb,0 34px 46px -14px rgba(28,50,84,.34)}
+.id3-bar{height:26px;display:flex;align-items:center;gap:6px;padding:0 12px;
+  background:linear-gradient(180deg,#ffffff,#f2f6fb);border-bottom:1px solid #eef2f7}
+.id3-bar i{width:7px;height:7px;border-radius:50%;background:#dbe3ec}
+.id3-ava-svg{display:block}
+
+/* main login card */
+.id3-main{width:262px;height:196px;left:169px;top:132px;transform:translateZ(70px)}
+.id3-main .id3-body{height:calc(100% - 26px);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;
+  background:linear-gradient(180deg,#ffffff,#e9f3ff)}
+.id3-main .id3-ava-svg{width:70px;height:70px;
+  filter:drop-shadow(0 8px 14px rgba(58,99,224,.32))}
+.id3-pass{width:150px;height:30px;border-radius:8px;background:#fff;
+  border:1px solid #dde6f3;display:flex;align-items:center;gap:7px;padding:0 14px;
+  box-shadow:inset 0 1px 2px rgba(22,40,80,.06)}
+.id3-pass i{width:7px;height:7px;border-radius:50%;
+  background:linear-gradient(135deg,#6ea8ff,#3a63e0)}
+
+/* mini cards */
+.id3-mini{width:150px;height:112px}
+.id3-mini .id3-body{height:calc(100% - 26px);display:flex;align-items:center;
+  justify-content:center;background:linear-gradient(180deg,#ffffff,#eef4fc)}
+.id3-mini .id3-ava-svg{width:44px;height:44px;
+  filter:drop-shadow(0 6px 10px rgba(58,99,224,.28))}
+.id3-mini-a{left:92px;top:34px;transform:translateZ(-24px);opacity:.94}
+.id3-mini-b{left:360px;top:300px;transform:translateZ(2px);opacity:.94}
+
+/* lock */
+.id3-lock{right:44px;top:44px;width:96px;transform:translateZ(108px);
+  filter:drop-shadow(0 20px 26px rgba(70,104,210,.4))}
+.id3-lock svg{display:block;width:100%;height:auto}
+
+/* shield */
+.id3-shield{left:88px;top:250px;width:118px;transform:translateZ(138px);
+  filter:drop-shadow(0 22px 26px rgba(4,140,200,.42))}
+.id3-shield svg{display:block;width:100%;height:auto}
+
+/* dashed connectors (flat plane behind) */
+.id3-links{left:0;top:0;width:600px;height:460px;transform:translateZ(-30px);
+  pointer-events:none;overflow:visible}
+.id3-links path{fill:none;stroke:#b9c6d6;stroke-width:2;stroke-dasharray:5 6;
+  stroke-linecap:round;opacity:.7}
+
+@media(max-width:640px){
+  .id-scene{height:360px;transform:scale(.72);transform-origin:top center;margin-top:8px}
+}
+
 /* ============================================================
    Voices of our customers  (matches eshipping.html)
    ============================================================ */
@@ -536,6 +608,10 @@ footer{
 
 <!-- ================= Hero ================= -->
 <section class="hero" id="hero">
+  <video class="hero-bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260319_015952_e1deeb12-8fb7-4071-a42a-60779fc64ab6.mp4" type="video/mp4">
+  </video>
+  <div class="hero-scrim" aria-hidden="true"></div>
   <h1 class="t1 reveal in">Design and Implementation of a<br><span class="cyan">Consumer Account System</span></h1>
   <p class="hero-sub reveal in d1">We created a consumer account system that centralizes user data, improves experience, offers multiple logins, and ensures secure integration.</p>
 
@@ -637,7 +713,80 @@ footer{
   <div class="inner">
     <h2 class="t2 center reveal">Future-Ready Integration: <span class="cyan">Centralizing Identity Management</span> Across Services</h2>
     <div class="identity reveal d1">
-      <img src="uploads/gid/img_identity.svg" alt="Centralized identity management diagram">
+      <div class="id-scene" role="img" aria-label="Centralized identity management diagram shown in 3D">
+        <div class="id-stage">
+
+          <!-- dashed connectors -->
+          <svg class="id3-links" viewBox="0 0 600 460" aria-hidden="true">
+            <path d="M300 230 C230 170 200 120 150 96"/>
+            <path d="M300 230 C380 300 400 330 396 320"/>
+            <path d="M300 230 C230 300 200 320 176 330"/>
+          </svg>
+
+          <!-- back mini card (top-left) -->
+          <div class="id3-card id3-mini id3-mini-a id3-float" style="animation-delay:-2s">
+            <div class="id3-bar"><i></i><i></i><i></i></div>
+            <div class="id3-body">
+              <svg class="id3-ava-svg" viewBox="0 0 48 48"><defs>
+                <linearGradient id="idAv1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7db0ff"/><stop offset="1" stop-color="#3a63e0"/></linearGradient>
+                <clipPath id="idClip1"><circle cx="24" cy="24" r="24"/></clipPath></defs>
+                <g clip-path="url(#idClip1)"><rect width="48" height="48" fill="url(#idAv1)"/><circle cx="24" cy="19" r="8" fill="#fff"/><circle cx="24" cy="47" r="15" fill="#fff"/></g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- back mini card (bottom-right) -->
+          <div class="id3-card id3-mini id3-mini-b id3-float" style="animation-delay:-4s">
+            <div class="id3-bar"><i></i><i></i><i></i></div>
+            <div class="id3-body">
+              <svg class="id3-ava-svg" viewBox="0 0 48 48"><defs>
+                <linearGradient id="idAv2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7db0ff"/><stop offset="1" stop-color="#3a63e0"/></linearGradient>
+                <clipPath id="idClip2"><circle cx="24" cy="24" r="24"/></clipPath></defs>
+                <g clip-path="url(#idClip2)"><rect width="48" height="48" fill="url(#idAv2)"/><circle cx="24" cy="19" r="8" fill="#fff"/><circle cx="24" cy="47" r="15" fill="#fff"/></g>
+              </svg>
+            </div>
+          </div>
+
+          <!-- lock (top-right) -->
+          <div class="id3-lock id3-float" style="animation-delay:-1s">
+            <svg viewBox="0 0 100 122" aria-hidden="true"><defs>
+              <linearGradient id="idLockBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9fb6f2"/><stop offset="1" stop-color="#5a78e0"/></linearGradient></defs>
+              <path d="M31 56 V40 a19 19 0 0 1 38 0 V56" fill="none" stroke="#8ea3e6" stroke-width="11" stroke-linecap="round"/>
+              <path d="M31 56 V40 a19 19 0 0 1 38 0 V56" fill="none" stroke="#b9c8f4" stroke-width="4" stroke-linecap="round"/>
+              <rect x="16" y="54" width="68" height="60" rx="14" fill="#4a67cf"/>
+              <rect x="16" y="52" width="68" height="60" rx="14" fill="url(#idLockBody)"/>
+              <rect x="16" y="52" width="68" height="16" rx="8" fill="#ffffff" opacity=".18"/>
+              <circle cx="50" cy="78" r="7" fill="#2f4bb0"/>
+              <rect x="47" y="82" width="6" height="16" rx="3" fill="#2f4bb0"/>
+            </svg>
+          </div>
+
+          <!-- main login card -->
+          <div class="id3-card id3-main id3-float">
+            <div class="id3-bar"><i></i><i></i><i></i></div>
+            <div class="id3-body">
+              <svg class="id3-ava-svg" viewBox="0 0 48 48"><defs>
+                <linearGradient id="idAv3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7db0ff"/><stop offset="1" stop-color="#3a63e0"/></linearGradient>
+                <clipPath id="idClip3"><circle cx="24" cy="24" r="24"/></clipPath></defs>
+                <g clip-path="url(#idClip3)"><rect width="48" height="48" fill="url(#idAv3)"/><circle cx="24" cy="19" r="8" fill="#fff"/><circle cx="24" cy="47" r="15" fill="#fff"/></g>
+              </svg>
+              <div class="id3-pass"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+
+          <!-- shield (bottom-left) -->
+          <div class="id3-shield id3-float" style="animation-delay:-3s">
+            <svg viewBox="0 0 120 142" aria-hidden="true"><defs>
+              <linearGradient id="idShield" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#28d3d6"/><stop offset=".55" stop-color="#12a9dd"/><stop offset="1" stop-color="#0a6fc4"/></linearGradient></defs>
+              <path d="M62 12 L112 30 V72 C112 106 90 126 62 137 C55 132 48 128 42 122 C64 112 82 94 82 66 V24 Z" fill="#06508f"/>
+              <path d="M60 10 L110 28 V70 C110 104 88 124 60 135 C32 124 10 104 10 70 V28 Z" fill="url(#idShield)"/>
+              <path d="M60 10 L60 135 C32 124 10 104 10 70 V28 Z" fill="#ffffff" opacity=".14"/>
+              <path d="M40 70 L54 85 L82 52" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+        </div>
+      </div>
     </div>
     <p class="c3 id-sub reveal d2">This account system will serve as the core identity management platform for other services, allowing for integration with multiple external systems in the future to provide unified authentication and user data management.</p>
   </div>
