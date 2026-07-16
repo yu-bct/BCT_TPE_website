@@ -287,8 +287,41 @@ section{position:relative}
 .kp-panel.in .mgmt-c4{animation-delay:.69s,2.15s}
 @keyframes mgmtIn{from{opacity:0;transform:translateY(26px) scale(.86)}to{opacity:1;transform:none}}
 @keyframes mgmtHop{0%,14%,100%{transform:translateY(0)}7%{transform:translateY(-4%)}}
+
+/* Animated global-orders UI — currency tags drop in beside USA */
+.orders-anim{position:relative;width:100%;aspect-ratio:629/417;margin-top:14px;
+  overflow:hidden;container-type:inline-size}
+.oa-bg{position:absolute;left:9.54%;top:5.76%;width:80.92%;height:auto}
+.oa-panel{position:absolute;left:24.72%;top:18.47%;width:75.28%;height:auto}
+.oa-tag{position:absolute;opacity:0;will-change:transform}
+.oa-pill{display:flex;align-items:center;border-radius:99em;background:#242424;
+  border:1px solid rgba(255,255,255,.06);white-space:nowrap;
+  font-family:'Poppins',sans-serif;color:#fff;
+  box-shadow:0 1.6cqw 3.2cqw rgba(0,0,0,.35)}
+.oa-pill img{border-radius:50%;object-fit:cover;flex:none}
+.oa-us{left:12.56%;top:27.58%;height:10.25cqw;gap:2.1cqw;padding:0 3.4cqw 0 1.27cqw;
+  font-size:3.34cqw;font-weight:600}
+.oa-us img{width:7.71cqw;height:7.71cqw}
+.oa-chev{width:2.2cqw;margin-left:.4cqw}
+.oa-eu{left:52.6%;top:29.92%;height:7.2cqw;gap:1.5cqw;padding:0 2.6cqw 0 1.1cqw;
+  font-size:3.2cqw;font-weight:500;border:2px solid var(--blue)}
+.oa-eu img{width:4.9cqw;height:4.9cqw}
+.oa-gbp{left:69.5%;top:30.52%;height:6.4cqw;gap:1.3cqw;padding:0 2.4cqw 0 1cqw;
+  font-size:2.9cqw;font-weight:500;color:#8B8B90}
+.oa-gbp img{width:4.1cqw;height:4.1cqw}
+.oa-krw{left:85%;top:31.36%;height:5.3cqw;gap:1.1cqw;padding:0 2cqw 0 .9cqw;
+  font-size:2.5cqw;font-weight:500;color:#8B8B90}
+.oa-krw img{width:3.4cqw;height:3.4cqw}
+.kp-panel.in .oa-us{animation:oaPop .5s cubic-bezier(.2,.9,.3,1.35) .25s both}
+.kp-panel.in .oa-eu{animation:oaDrop .65s cubic-bezier(.25,.9,.3,1.2) .55s both}
+.kp-panel.in .oa-gbp{animation:oaDrop .65s cubic-bezier(.25,.9,.3,1.2) .75s both}
+.kp-panel.in .oa-krw{animation:oaDrop .65s cubic-bezier(.25,.9,.3,1.2) .95s both}
+@keyframes oaPop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:none}}
+@keyframes oaDrop{0%{opacity:0;transform:translateY(-180%)}45%{opacity:1}
+  100%{opacity:1;transform:translateY(0)}}
+
 @media (prefers-reduced-motion:reduce){
-  .mgmt-card{opacity:1;animation:none !important}
+  .mgmt-card,.oa-tag{opacity:1;animation:none !important}
 }
 
 /* ============================================================
@@ -518,7 +551,16 @@ footer{background:#04050d;border-top:1px solid rgba(255,255,255,0.07);padding:64
           <p class="kp-label">Efficiency of Global Orders Handling</p>
           <h3 class="kp-title">Supports Global Pricing and Logistics<br>Management</h3>
         </div>
-        <img class="kp-ui" src="uploads/custombike/orders_ui.png" width="1258" height="834" loading="lazy" alt="Global orders UI — multi-currency selector (USA Dollar, EU, GBP, KRW) with pricing fields">
+        <div class="orders-anim" role="img" aria-label="Global orders UI — multi-currency selector (USA Dollar, EU, GBP, KRW) with pricing fields">
+          <img class="oa-bg" src="uploads/custombike/orders_bg.png" width="1018" height="700" loading="lazy" alt="">
+          <img class="oa-panel" src="uploads/custombike/orders_panel.png" width="947" height="680" loading="lazy" alt="">
+          <div class="oa-tag oa-pill oa-us"><img src="uploads/custombike/flag_us.png" width="128" height="128" loading="lazy" alt="">USA (Dollar)
+            <svg class="oa-chev" viewBox="0 0 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5 7 6.5 13 1.5"/></svg>
+          </div>
+          <div class="oa-tag oa-pill oa-eu"><img src="uploads/custombike/flag_eu.png" width="128" height="128" loading="lazy" alt="">EU</div>
+          <div class="oa-tag oa-pill oa-gbp"><img src="uploads/custombike/flag_gbp.png" width="128" height="128" loading="lazy" alt="">GBP</div>
+          <div class="oa-tag oa-pill oa-krw"><img src="uploads/custombike/icon_krw.png" width="67" height="67" loading="lazy" alt="">KRW</div>
+        </div>
       </div>
     </div>
   </div>
