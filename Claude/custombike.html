@@ -263,6 +263,34 @@ section{position:relative}
 .kp-title{font-size:20px;font-weight:600;line-height:28px;letter-spacing:.4px;color:#fff;margin-top:10px}
 .kp-ui{width:100%;height:auto;display:block;margin-top:14px}
 
+/* Animated management UI — Figma mgmt_ui rebuilt as sequenced cards */
+.mgmt-anim{position:relative;width:100%;aspect-ratio:629/417;margin-top:14px;
+  overflow:hidden;background:var(--bg)}
+.mgmt-win{position:absolute;left:8.9%;top:10.07%;width:103.34%;height:97.85%;
+  background:#2B2B2B;border-radius:12px}
+.mgmt-dots{position:absolute;left:13.04%;top:12.95%;width:100%;display:flex;gap:1.27%}
+.mgmt-dots i{width:1.43%;aspect-ratio:1;border-radius:50%;background:#4D4E51}
+.mgmt-card{position:absolute;opacity:0;will-change:transform}
+.mgmt-card img{width:100%;height:auto;display:block}
+.mgmt-c1{left:13.04%;top:22.54%;width:41.34%}
+.mgmt-c2{left:58.35%;top:22.54%;width:41.65%}
+.mgmt-c3{left:13.04%;top:71.94%;width:39.43%}
+.mgmt-c4{left:55.17%;top:69.3%;width:41.34%}
+/* entrance pop (once) + looping hop, card1→4 in sequence */
+.kp-panel.in .mgmt-card{
+  animation:mgmtIn .55s cubic-bezier(.2,.9,.3,1.4) both,
+            mgmtHop 4.8s ease-in-out infinite;
+}
+.kp-panel.in .mgmt-c1{animation-delay:.15s,1.1s}
+.kp-panel.in .mgmt-c2{animation-delay:.33s,1.45s}
+.kp-panel.in .mgmt-c3{animation-delay:.51s,1.8s}
+.kp-panel.in .mgmt-c4{animation-delay:.69s,2.15s}
+@keyframes mgmtIn{from{opacity:0;transform:translateY(26px) scale(.86)}to{opacity:1;transform:none}}
+@keyframes mgmtHop{0%,14%,100%{transform:translateY(0)}7%{transform:translateY(-4%)}}
+@media (prefers-reduced-motion:reduce){
+  .mgmt-card{opacity:1;animation:none !important}
+}
+
 /* ============================================================
    Voices of our customers
    ============================================================ */
@@ -476,7 +504,14 @@ footer{background:#04050d;border-top:1px solid rgba(255,255,255,0.07);padding:64
           <p class="kp-label">Powerful Management System</p>
           <h3 class="kp-title">Streamlines the Process of<br>Managing Bicycle Models and Parts</h3>
         </div>
-        <img class="kp-ui" src="uploads/custombike/mgmt_ui.webp" width="1258" height="834" loading="lazy" alt="Management system UI — part table with Snapshot, Brand and Level columns, a bike preview and snapshot cards">
+        <div class="mgmt-anim" role="img" aria-label="Management system UI — part table with Snapshot, Brand and Level columns, a bike preview and snapshot cards">
+          <div class="mgmt-win"></div>
+          <div class="mgmt-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="mgmt-card mgmt-c1"><img src="uploads/custombike/mgmt_card1.webp" width="520" height="362" loading="lazy" alt=""></div>
+          <div class="mgmt-card mgmt-c2"><img src="uploads/custombike/mgmt_card2.webp" width="524" height="363" loading="lazy" alt=""></div>
+          <div class="mgmt-card mgmt-c3"><img src="uploads/custombike/mgmt_card3.webp" width="496" height="234" loading="lazy" alt=""></div>
+          <div class="mgmt-card mgmt-c4"><img src="uploads/custombike/mgmt_card4.webp" width="520" height="256" loading="lazy" alt=""></div>
+        </div>
       </div>
       <div class="kp-panel reveal d1">
         <div class="kp-head">
