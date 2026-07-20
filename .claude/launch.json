@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bct-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8943", "--directory", "/Users/yushiting/Claude/BCT_TPE_Website"],
+      "port": 8943
+    }
+  ]
+}
